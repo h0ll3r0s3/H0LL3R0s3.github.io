@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            windows安全加固
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h1 id="Windows安全加固手册"><a href="#Windows安全加固手册" class="headerlink" title="Windows安全加固手册"></a>Windows安全加固手册</h1><h1 id="1-身份鉴别"><a href="#1-身份鉴别" class="headerlink" title="1   身份鉴别"></a>1   身份鉴别</h1><h2 id="1-1-密码安全策略"><a href="#1-1-密码安全策略" class="headerlink" title="1.1     密码安全策略"></a>1.1     密码安全策略</h2><p>要求：操作系统和数据库系统管理用户身份鉴别信息应具有不易被冒用的特点，口令应有复杂度要求并定期更换。</p>
+<p>目的：设置有效的密码策略，防止攻击者破解出密码。</p>
+<p>操作步骤：</p>
+<p>【位置】开始—管理工具—本地安全策略—帐户策略—密码策略，加固设置为下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129194631677-1059288079.png" alt="img"></p>
+<h2 id="1-2-帐号锁定策略"><a href="#1-2-帐号锁定策略" class="headerlink" title="1.2     帐号锁定策略"></a>1.2     帐号锁定策略</h2><p>要求：应启用登录失败处理功能，可采取结束会话、限制非法登录次数和自动退出等措施。</p>
+<p>目的：遭遇密码破解时，暂时锁定帐号，降低密码被猜解的可能性。</p>
+<p>操作步骤：</p>
+<p>【位置】开始—管理工具—本地安全策略—帐户策略—帐号锁定策略，加固后如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129195151524-1302720566.png" alt="img"></p>
+<h2 id="1-3-安全的远程管理方式"><a href="#1-3-安全的远程管理方式" class="headerlink" title="1.3     安全的远程管理方式"></a>1.3     安全的远程管理方式</h2><p>要求：当对服务器进行远程管理时，应采取必要措施，防止鉴别信息在网络传输过程中被窃听。</p>
+<p>目的：防止远程管理过程中，密码等敏感信息被窃听</p>
+<p>操作步骤：</p>
+<p>【位置】开始—管理工具—远程桌面服务—远程桌面会话主机配置，右键“RDP-Tcp”,选择“属性”—“常规”，加固后如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129195302097-537941695.png" alt="img"></p>
+<h1 id="2-访问控制"><a href="#2-访问控制" class="headerlink" title="2    访问控制"></a>2    访问控制</h1><h2 id="2-1-关闭默认共享"><a href="#2-1-关闭默认共享" class="headerlink" title="2.1     关闭默认共享"></a>2.1     关闭默认共享</h2><p>要求：应启用访问控制功能，依据安全策略控制用户对资源的访问。</p>
+<p>目的：如果没有关闭系统默认共享，攻击者通过 IPC$方式暴力破解帐户的密码，而后利用系统默认共享如：C$、D$等，对系统的硬盘进行访问</p>
+<p>操作步骤：</p>
+<p>【位置】开始—管理工具—共享和存储管理，记录当前配置，默认如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129200458753-294972814.png" alt="img"></p>
+<p>右键依次点击C$、D$、ADMIN$，停止共享，加固后如下图所示：</p>
+<p>net share C$ &#x2F;del</p>
+<p>net share D$ &#x2F;del</p>
+<p>net share ADMIN$ &#x2F;del</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129200515526-1544759151.png" alt="img"></p>
+<p>操作步骤：</p>
+<p>【位置】运行—regedit进入注册表，在HKEY_LOCAL_MACHINE—SYSTEM—CurrentControlSet—Services—LanmanServer—Parameters下，新增AutoShareServer、AutoShareWks两个键，类型为DWORD（32位），值为0，如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129200530856-1296573384.png" alt="img"></p>
+<h2 id="2-2-用户权限分配"><a href="#2-2-用户权限分配" class="headerlink" title="2.2     用户权限分配"></a>2.2     用户权限分配</h2><p>要求：应根据管理用户的角色分配权限，实现管理用户的权限分离，仅授予管理用户所需的最小权限。</p>
+<p>目的：如果系统没有对帐号进行严格的权限分配，则黑客可以利用低权限的帐号登陆终端，甚至关闭系统。</p>
+<p>操作步骤：</p>
+<p>【位置】开始—管理工具—本地安全策略—本地策略—用户权限分配，“关闭系统”，记录当前配置，默认如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129200709622-537296574.png" alt="img"></p>
+<p>只保留Administrators组、其它全部删除</p>
+<p>“允许通过远程桌面服务登录”，记录当前配置，默认如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129200725316-54363352.png" alt="img"></p>
+<p>只保留Administrators组、其它全部删除</p>
+<h2 id="2-3-禁止未登录前关机"><a href="#2-3-禁止未登录前关机" class="headerlink" title="2.3     禁止未登录前关机"></a>2.3     禁止未登录前关机</h2><p>目的:禁止系统在未登录前关机，防止非法用户随意关闭系统。</p>
+<p>操作步骤:</p>
+<p>【位置】开始—管理工具—本地安全策略—本地策略—安全选项—“关机：允许系统在未登录的情况下关闭”，默认如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129200848292-1990105707.png" alt="img"></p>
+<h2 id="2-4-重命名默认帐号"><a href="#2-4-重命名默认帐号" class="headerlink" title="2.4    重命名默认帐号"></a>2.4    重命名默认帐号</h2><p>要求：应严格限制默认帐户的访问权限，重命名系统默认帐户，修改这些帐户的默认口令。</p>
+<p>目的：修改默认帐号，防止攻击者破解密码。</p>
+<p>操作步骤：</p>
+<p>【位置】开始—管理工具—计算机管理—系统工具—本地用户和组—用户，可修改成下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129200933621-517714984.png" alt="img"></p>
+<h2 id="2-5-多余帐号"><a href="#2-5-多余帐号" class="headerlink" title="2.5     多余帐号"></a>2.5     多余帐号</h2><p>要求:应及时删除多余的、过期的帐户，避免共享帐户的存在。</p>
+<p>目的:删除或禁用临时、过期及可疑的帐号，防止被非法利用。</p>
+<p>操作步骤:</p>
+<p>【位置】开始—管理工具—计算机管理—系统工具—本地用户和组—用户，询问管理员每个帐号的用途，确认多余的帐号，然后右键点击“删除”或“禁用”。可使用net user 用户名 命令查看该用户的详细信息，如下所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129201111398-908924541.png" alt="img"></p>
+<h1 id="3-安全审计"><a href="#3-安全审计" class="headerlink" title="3   安全审计"></a>3   安全审计</h1><p>要求:</p>
+<p>审计范围应覆盖到服务器和重要客户端上的每个操作系统用户和数据库用户；</p>
+<p>审计内容应包括重要用户行为、系统资源的异常使用和重要系统命令的使用等系统内重要的安全相关事件；</p>
+<p>审计记录应包括事件的日期、时间、类型、主体标识、客体标识和结果等；应能够根据记录数据进行分析，并生成审计报表；</p>
+<p>应保护审计进程，避免受到未预期的中断；</p>
+<p>应保护审计记录，避免受到未预期的删除、修改或覆盖等。</p>
+<h2 id="3-1-审核策略设置"><a href="#3-1-审核策略设置" class="headerlink" title="3.1     审核策略设置"></a>3.1     审核策略设置</h2><p>目的:开启审核策略，若日后系统出现故障、安全事故则可以查看系统日志文件，排除故障、追查入侵者的信息等。</p>
+<p>操作步骤:</p>
+<p>【位置】运行—管理工具—本地安全策略—本地策略—审核策略，策略建议设置为：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129201325286-331571127.png" alt="img"></p>
+<h2 id="3-2-安全日志属性设置"><a href="#3-2-安全日志属性设置" class="headerlink" title="3.2     安全日志属性设置"></a>3.2     安全日志属性设置</h2><p>目的:防止重要日志信息被覆盖</p>
+<p>操作步骤:</p>
+<p>【位置】开始—管理工具—事件查看器—Windows日志，“应用程序”、“系统”、“安全” 依次如下操作：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129201420935-27797900.png" alt="img"></p>
+<h1 id="4-剩余信息保护"><a href="#4-剩余信息保护" class="headerlink" title="4   剩余信息保护"></a>4   剩余信息保护</h1><h2 id="4-1-不记住用户名和密码"><a href="#4-1-不记住用户名和密码" class="headerlink" title="4.1     不记住用户名和密码"></a>4.1     不记住用户名和密码</h2><p>目的:应保证操作系统和数据库管理系统用户的鉴别信息所在的存储空间，被释放或再分配给其他用户前得到完全清除，无论这些信息是存放在硬盘上还是在内存中。</p>
+<p>操作步骤:</p>
+<p>【位置】开始—管理工具—本地安全策略—本地策略—安全选项</p>
+<p>“交互式登录：不显示最后的用户名”，默认如下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129201644663-1943501219.png" alt="img"></p>
+<p>选择“已启用”</p>
+<h2 id="4-2-清理内存信息"><a href="#4-2-清理内存信息" class="headerlink" title="4.2     清理内存信息"></a>4.2     清理内存信息</h2><p>要求:应确保系统内的文件、目录和数据库记录等资源所在的存储空间，被释放或重新分配给其他用户前得到完全清除。</p>
+<p>目的：及时清理存放在系统中的用户鉴别信息，防止信息外泄，被黑客利用</p>
+<p>操作步骤:</p>
+<p>【位置】开始—管理工具—本地安全策略—本地策略—安全选项—关机：清除虚拟内存页面文件，设定如下所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129201739545-2087855998.png" alt="img"></p>
+<h2 id="4-3-关闭调试信息"><a href="#4-3-关闭调试信息" class="headerlink" title="4.3     关闭调试信息"></a>4.3     关闭调试信息</h2><p>目的：系统启动失败时，为了分析启动失败的原因，内存信息会自动转储到硬盘中。其中数据对普通用户无用,及时清理存这些信息或禁止出错转储，防止外泄被黑客利用。</p>
+<p>操作步骤:</p>
+<p>【位置】开始—计算机—右键“属性”—高级系统设置—高级—启动和故障恢复—设置，设定如下所示：</p>
+<p> <img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129201820621-807563493.png" alt="img"></p>
+<h1 id="5-入侵防范"><a href="#5-入侵防范" class="headerlink" title="5   入侵防范"></a>5   入侵防范</h1><h2 id="5-1-卸载冗余组件"><a href="#5-1-卸载冗余组件" class="headerlink" title="5.1     卸载冗余组件"></a>5.1     卸载冗余组件</h2><p>要求:操作系统遵循最小安装的原则，仅安装需要的组件和应用程序，并通过设置升级服务器等方式保持系统补丁及时得到更新。</p>
+<p>目的：卸载WScript.Shell, Shell.application这两个组件，防止黑客通过脚本来提权。</p>
+<p>操作步骤:</p>
+<p>【位置】运行—cmd，执行如下信息：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129201904364-1138787498.png" alt="img"></p>
+<h2 id="5-2-关闭不必要服务"><a href="#5-2-关闭不必要服务" class="headerlink" title="5.2    关闭不必要服务"></a>5.2    关闭不必要服务</h2><p>目的:关闭与系统业务无关或不必要的服务，减小系统被黑客被攻击、渗透的风险。</p>
+<p>操作步骤:</p>
+<p>【位置】开始—管理工具—服务，可禁用如下服务：</p>
+<p>IP Helper       （Ipv6技术  启动类型：禁用  服务状态：停止）</p>
+<p>Remote Registry （Ipv6技术  启动类型：禁用  服务状态：停止）</p>
+<p>Themes        （主题管理  启动类型：禁用  服务状态：停止）</p>
+<h1 id="6-恶意代码防范"><a href="#6-恶意代码防范" class="headerlink" title="6   恶意代码防范"></a>6   恶意代码防范</h1><h2 id="6-1-杀毒软件"><a href="#6-1-杀毒软件" class="headerlink" title="6.1     杀毒软件"></a>6.1     杀毒软件</h2><p>要求:应安装防恶意代码软件，并及时更新防恶意代码软件版本和恶意代码库。</p>
+<p>目的:安装杀毒软件，对恶意代码等进行防范及查杀。</p>
+<p>推荐杀毒软件：</p>
+<p>卡巴斯基：<a target="_blank" rel="noopener" href="http://devbuilds.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe">http://devbuilds.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe</a></p>
+<p>大蜘蛛：<a target="_blank" rel="noopener" href="http://free.drweb.ru/download+cureit+free">http://free.drweb.ru/download+cureit+free</a></p>
+<p>火绒安全软件：<a target="_blank" rel="noopener" href="https://www.huorong.cn/">https://www.huorong.cn</a></p>
+<p>360杀毒：<a target="_blank" rel="noopener" href="http://sd.360.cn/download_center.html">http://sd.360.cn/download_center.html</a></p>
+<h1 id="7-系统资源控制"><a href="#7-系统资源控制" class="headerlink" title="7   系统资源控制"></a>7   系统资源控制</h1><h2 id="7-1-屏幕保护"><a href="#7-1-屏幕保护" class="headerlink" title="7.1     屏幕保护"></a>7.1     屏幕保护</h2><p>要求:应根据安全策略设置登录终端的操作超时锁定。</p>
+<p>目的：设置屏保密码，提高服务器的安全性</p>
+<p>操作步骤:</p>
+<p>【位置】开始—控制面板—显示—更改屏幕保护程序，如下所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129202140800-1265578490.png" alt="img"></p>
+<h2 id="7-2-设置会话超时锁定策略"><a href="#7-2-设置会话超时锁定策略" class="headerlink" title="7.2     设置会话超时锁定策略"></a>7.2     设置会话超时锁定策略</h2><p>要求:设置会话超时锁定功能，提高服务器的安全性。</p>
+<p>操作步骤：</p>
+<p>【位置】运行—gpedit.msc—计算机配置—管理模版—Windows组件—远程桌面服务—远程桌面会话主机—会话时间限制—设置活动但空闲的远程桌面服务会话的时间限制，设定如下信息：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/windows%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/1525384-20181129202209928-2104306425.png" alt="img"></p>
+<p>注：摘自<a target="_blank" rel="noopener" href="https://www.cnblogs.com/skkip/p/10040743.html">https://www.cnblogs.com/skkip/p/10040743.html</a></p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

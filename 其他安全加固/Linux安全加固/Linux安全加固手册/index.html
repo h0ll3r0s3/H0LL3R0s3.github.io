@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            Linux安全加固手册
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h1 id="1-身份鉴别"><a href="#1-身份鉴别" class="headerlink" title="1   身份鉴别"></a>1   身份鉴别</h1><h2 id="1-1-密码安全策略"><a href="#1-1-密码安全策略" class="headerlink" title="1.1     密码安全策略"></a>1.1     密码安全策略</h2><p>操作系统和数据库系统管理用户身份鉴别信息应具有不易被冒用的特点，口令应有复杂度要求并定期更换。</p>
+<p>设置有效的密码策略，防止攻击者破解出密码</p>
+<p>1）查看空口令帐号并为弱&#x2F;空口令帐号设置强密码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># awk -F: &#x27;($2 == &quot;&quot;)&#123;print $1&#125;&#x27; /etc/shadow</span><br></pre></td></tr></table></figure>
+
+<p>可用离线破解、暴力字典破解或者密码网站查询出帐号密钥的密码是否是弱口令</p>
+<p>2）修改vi &#x2F;etc&#x2F;login.defs配置密码周期策略</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205221612917-1172060013.png" alt="img"></p>
+<p>此策略只对策略实施后所创建的帐号生效， 以前的帐号还是按99999天周期时间来算。</p>
+<p>3）&#x2F;etc&#x2F;pam.d&#x2F;system-auth配置密码复杂度：</p>
+<p>在文件中添加如下一行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">password requisite pam_cracklib.so retry``=``3` `difok``=``2` `minlen``=``8` `lcredit``=``-``1` `dcredit``=``-``1</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205221755886-525542012.png" alt="img"></p>
+<p>参数含义如下所示：</p>
+<p>difok：本次密码与上次密码至少不同字符数</p>
+<p>minlen：密码最小长度，此配置优先于login.defs中的PASS_MAX_DAYS</p>
+<p>ucredit：最少大写字母</p>
+<p>lcredit：最少小写字母</p>
+<p>dcredit：最少数字</p>
+<p>retry：重试多少次后返回密码修改错误</p>
+<p>【注】用root修改其他帐号都不受密码周期及复杂度配置的影响。</p>
+<h2 id="1-2-登录失败策略"><a href="#1-2-登录失败策略" class="headerlink" title="1.2     登录失败策略"></a>1.2     登录失败策略</h2><p> 应启用登录失败处理功能，可采取结束会话、限制非法登录次数和自动退出等措施。</p>
+<p>遭遇密码破解时，暂时锁定帐号，降低密码被猜解的可能性</p>
+<p>1）方法一：&#x2F;etc&#x2F;pam.d&#x2F;login中设定控制台；&#x2F;etc&#x2F;pam.d&#x2F;sshd中设定SSH</p>
+<p>&#x2F;etc&#x2F;pam.d&#x2F;sshd中第二行添加下列信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">auth required pam_tally2.so deny``=``5` `lock_time``=``2` `even_deny_root unlock_time``=``60</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205223837945-446682955.png" alt="img"></p>
+<p>###########参数解释############</p>
+<p>查看用户登录失败次数</p>
+<p># pam_tally2 –user root</p>
+<p>解锁用户</p>
+<p># pam_tally2 -r -u root</p>
+<p>even_deny_root  也限制root用户(默认配置就锁定root帐号)；<br>deny   设置普通用户和root用户连续错误登陆的最大次数，超过最大次数，则锁定该用户<br>unlock_time   设定普通用户锁定后，多少时间后解锁，单位是秒；  </p>
+<p>root_unlock_time   设定root用户锁定后，多少时间后解锁，单位是秒；</p>
+<h2 id="1-3-安全的远程管理方式"><a href="#1-3-安全的远程管理方式" class="headerlink" title="1.3     安全的远程管理方式"></a>1.3     安全的远程管理方式</h2><p>当对服务器进行远程管理时，应采取必要措施，防止鉴别信息在网络传输过程中被窃听。</p>
+<p>防止远程管理过程中，密码等敏感信息被窃听</p>
+<p>执行如下语句，查看telnet服务是否在运行</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205224325746-1696544968.png" alt="img"></p>
+<p>禁止telnet运行，禁止开机启动，如下图：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205224414627-249113811.png" alt="img"></p>
+<h1 id="2-访问控制"><a href="#2-访问控制" class="headerlink" title="2   访问控制"></a>2   访问控制</h1><p>应及时删除多余的、过期的帐户，避免共享帐户的存在。</p>
+<p>删除或禁用临时、过期及可疑的帐号，防止被非法利用。</p>
+<p>主要是管理员创建的普通帐号，如：test</p>
+<p># usermod -L user 禁用帐号，帐号无法登录，&#x2F;etc&#x2F;shadow第二栏显示为!开头</p>
+<p># userdel user 删除user用户</p>
+<p># userdel -r user将删除user用户，并且将&#x2F;home目录下的user目录一并删除</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205224852910-302636683.png" alt="img"></p>
+<p>加固后如图</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205224920900-683044083.png" alt="img"></p>
+<h1 id="3-安全审计"><a href="#3-安全审计" class="headerlink" title="3   安全审计"></a>3   安全审计</h1><h2 id="3-1-审核策略开启"><a href="#3-1-审核策略开启" class="headerlink" title="3.1     审核策略开启"></a>3.1     审核策略开启</h2><p>审计范围应覆盖到服务器和重要客户端上的每个操作系统用户和数据库用户；</p>
+<p>开启审核策略，若日后系统出现故障、安全事故则可以查看系统日志文件，排除故障、追查入侵者的信息等。</p>
+<p>查看rsyslog与auditd服务是否开启</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225114508-2006021888.png" alt="img"></p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225125024-1395612162.png" alt="img"></p>
+<p>rsyslog一般都会开启，auditd如没开启，执行如下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># systemctl start auditd</span><br></pre></td></tr></table></figure>
+
+<p>auditd服务开机启动</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># systemctl start auditd</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225148742-765313218.png" alt="img"></p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225156200-2020450400.png" alt="img"></p>
+<h2 id="3-2-日志属性设置"><a href="#3-2-日志属性设置" class="headerlink" title="3.2     日志属性设置"></a>3.2     日志属性设置</h2><p>应保护审计记录，避免受到未预期的删除、修改或覆盖等。</p>
+<p>防止重要日志信息被覆盖</p>
+<p>让日志文件转储一个月，保留6个月的信息，先查看目前配置，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># more /etc/logrotate.conf | grep -v &quot;^#\|^$&quot;</span><br></pre></td></tr></table></figure>
+
+<p>需要修改配置为下图所示：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225255013-1107266259.png" alt="img"></p>
+<h1 id="4-入侵防御"><a href="#4-入侵防御" class="headerlink" title="4   入侵防御"></a>4   入侵防御</h1><p>操作系统遵循最小安装的原则，仅安装需要的组件和应用程序，并通过设置升级服务器等方式保持系统补丁及时得到更新。</p>
+<p>关闭与系统业务无关或不必要的服务，减小系统被黑客被攻击、渗透的风险。</p>
+<p>禁用蓝牙服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># systemctl stop bluetooth</span><br></pre></td></tr></table></figure>
+
+<p>禁止蓝牙开机启动</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225426342-1764124584.png" alt="img"></p>
+<h1 id="5-系统资源控制"><a href="#5-系统资源控制" class="headerlink" title="5   系统资源控制"></a>5   系统资源控制</h1><h2 id="5-1-访问控制"><a href="#5-1-访问控制" class="headerlink" title="5.1     访问控制"></a>5.1     访问控制</h2><p>应通过设定终端接入方式、网络地址范围等条件限制终端登录。</p>
+<p>对接入服务器的IP、方式等进行限制，可以阻止非法入侵。</p>
+<p>\1) 在&#x2F;etc&#x2F;hosts.allow和&#x2F;etc&#x2F;hosts.deny文件中配置接入限制</p>
+<p>最好的策略就是阻止所有的主机在“&#x2F;etc&#x2F;hosts.deny”文件中加入“ ALL:ALL@ALL, PARANOID ”，然后再在“&#x2F;etc&#x2F;hosts.allow” 文件中加入所有允许访问的主机列表。如下操作：</p>
+<p>编辑 hosts.deny文件（vi &#x2F;etc&#x2F;hosts.deny），加入下面该行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># Deny access to everyone. ``ALL``: ``ALL``@``ALL``, PARANOID</span><br></pre></td></tr></table></figure>
+
+<p>编辑hosts.allow 文件（vi &#x2F;etc&#x2F;hosts.allow），加入允许访问的主机列表，比如：</p>
+<p>ftp: 202.54.15.99 foo.com  &#x2F;&#x2F;202.54.15.99是允许访问 ftp 服务的 IP 地址</p>
+<p>&#x2F;&#x2F;foo.com 是允许访问 ftp 服务的主机名称。</p>
+<p> <img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225653567-1377216965.png" alt="img"></p>
+<p>\2) 也可以用iptables进行访问控制</p>
+<h2 id="5-2-超时锁定"><a href="#5-2-超时锁定" class="headerlink" title="5.2     超时锁定"></a>5.2     超时锁定</h2><p>应根据安全策略设置登录终端的操作超时锁定。</p>
+<p>设置登录超时时间，释放系统资源，也提高服务器的安全性。</p>
+<p>&#x2F;etc&#x2F;profile中添加如下一行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exprot TMOUT``=``900` `/``/``15``分钟``# source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<p>改变这项设置后，必须先注销用户，再用该用户登录才能激活这个功能。</p>
+<p>如果有需要，开启屏幕保护功能</p>
+<p>设置屏幕保护：设置 -&gt; 系统设置 -&gt; 屏幕保护程序，进行操作</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225753044-1391402292.png" alt="img"></p>
+<h1 id="6-最佳经验实践"><a href="#6-最佳经验实践" class="headerlink" title="6   最佳经验实践"></a>6   最佳经验实践</h1><p>对Linux系统的安全性提升有一定帮助。</p>
+<h2 id="6-1-DOS攻击防御"><a href="#6-1-DOS攻击防御" class="headerlink" title="6.1     DOS攻击防御"></a>6.1     DOS攻击防御</h2><p>防止拒绝服务攻击</p>
+<p>TCP SYN保护机制等设置</p>
+<p>1）打开 syncookie：</p>
+<p># echo“1”&gt;&#x2F;proc&#x2F;sys&#x2F;net&#x2F;ipv4&#x2F;tcp_syncookies &#x2F;&#x2F;默认为1，一般不用设置</p>
+<p>表示开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击，默认为0，表示关闭；</p>
+<p>2）防syn 攻击优化</p>
+<p>用vi编辑&#x2F;etc&#x2F;sysctl.conf，添加如下行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.tcp_max_syn_backlog ``=` `2048</span><br></pre></td></tr></table></figure>
+
+<p>进入SYN包的最大请求队列.默认1024.对重负载服务器,增加该值显然有好处.可调整到2048.</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205225954451-637082623.png" alt="img"></p>
+<h2 id="6-2-历史命令"><a href="#6-2-历史命令" class="headerlink" title="6.2     历史命令"></a>6.2     历史命令</h2><p>为历史的命令增加登录的IP地址、执行命令时间等</p>
+<p>1）保存1万条命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># sed -i &#x27;s/^HISTSIZE=1000/HISTSIZE=10000/g&#x27; /etc/profile</span><br></pre></td></tr></table></figure>
+
+<p>2）在&#x2F;etc&#x2F;profile的文件尾部添加如下行数配置信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">USER_IP``=```who ``-``u am i ``2``&gt;``/``dev``/``null| awk ``&#x27;&#123;print $NF&#125;&#x27;` `|sed ``-``e ``&#x27;s/[()]//g&#x27;`````if` `[ ``&quot;$USER_IP&quot;` `=` `&quot;&quot; ]``then``USER_IP``=```hostname```fi``export HISTTIMEFORMAT``=``&quot;%F %T $USER_IP `whoami` &quot;``shopt ``-``s histappend``export PROMPT_COMMAND``=``&quot;history -a&quot;</span><br></pre></td></tr></table></figure>
+
+<p>##source &#x2F;etc&#x2F;profile让配置生效</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA/Linux%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%89%8B%E5%86%8C/1525384-20181205230221404-1313768794.png" alt="img"></p>
+<p> 注：摘自[<a target="_blank" rel="noopener" href="https://www.cnblogs.com/skkip/p/10074096.html]">https://www.cnblogs.com/skkip/p/10074096.html]</a></p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

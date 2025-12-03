@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            中间件漏洞收集
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h1 id="中间件漏洞收集"><a href="#中间件漏洞收集" class="headerlink" title="#中间件漏洞收集"></a>#中间件漏洞收集</h1><h2 id="1、IIS常见漏洞："><a href="#1、IIS常见漏洞：" class="headerlink" title="1、IIS常见漏洞："></a>1、IIS常见漏洞：</h2><h4 id="IIS6-X解析漏洞："><a href="#IIS6-X解析漏洞：" class="headerlink" title="IIS6.X解析漏洞："></a><strong>IIS6.X解析漏洞：</strong></h4><p>​	（1）该版本会默认将*.asp;.jpeg为后缀的文件名，当成Asp解析，原理是服务器默认不解析；其后面的内容，相当于截断。</p>
+<p>​	（2）该版本会将*.asp&#x2F;目录下的所有文件当作ASP文件来解析。</p>
+<p>​	（3）其他默认扩展名.asa, .cdx, .cer ,apx也会解析成asp</p>
+<h4 id="IIS7-x解析漏洞"><a href="#IIS7-x解析漏洞" class="headerlink" title="IIS7.x解析漏洞:"></a><strong>IIS7.x解析漏洞:</strong></h4><p>​	（1）在一个文件路径（&#x2F;xx.jpg）后面加上&#x2F;xx.php会将&#x2F;xx.jpg&#x2F;xx.php解析为php文件。</p>
+<h4 id="IIS6-X-PUT任意文件写入"><a href="#IIS6-X-PUT任意文件写入" class="headerlink" title="IIS6.X_PUT任意文件写入"></a><strong>IIS6.X_PUT任意文件写入</strong></h4><p>​	 	IIS在网站拓展服务中开启了WebDAV，配合写入权限，存在PUT任意文件写入漏洞</p>
+<h4 id="IIS短文件名机制"><a href="#IIS短文件名机制" class="headerlink" title="IIS短文件名机制"></a><strong>IIS短文件名机制</strong></h4><p>​		IIS 的短文件名机制,可以暴力猜解短文件名,访问构造的某个存在的短文件名,会返回404,访问构造的某个不存在的短文件名,返回400。</p>
+<p>然后根据猜解的短文件名。继续通过其他方法猜文件名全名。</p>
+<h2 id="2、Apache常见解析漏洞"><a href="#2、Apache常见解析漏洞" class="headerlink" title="2、Apache常见解析漏洞"></a>2、Apache常见解析漏洞</h2><h4 id="Apache后缀解析漏洞"><a href="#Apache后缀解析漏洞" class="headerlink" title="Apache后缀解析漏洞"></a><strong>Apache后缀解析漏洞</strong></h4><p>​	该漏洞可以利用.来分割后缀，最右边后缀服务器没法识别时会向左读取，直到可以解析为止。例如xx.php.jpeg。</p>
+<h4 id="CVE-2017-15715"><a href="#CVE-2017-15715" class="headerlink" title="CVE-2017-15715"></a><strong>CVE-2017-15715</strong></h4><p>​	该漏洞可以概括为apache的换行符解析漏洞，简单来说就是.php加上换行符就能被解析成php文件</p>
+<h4 id="未知扩展名解析漏洞"><a href="#未知扩展名解析漏洞" class="headerlink" title="未知扩展名解析漏洞"></a><strong>未知扩展名解析漏洞</strong></h4><p>​	当apache遇到未知的后缀名时并不会停止解析，而会向后继续解析。例如 xx.php.xino</p>
+<h2 id="3、Ngnix常见漏洞"><a href="#3、Ngnix常见漏洞" class="headerlink" title="3、Ngnix常见漏洞"></a>3、Ngnix常见漏洞</h2><h4 id="文件解析漏洞"><a href="#文件解析漏洞" class="headerlink" title="文件解析漏洞"></a><strong>文件解析漏洞</strong></h4><p>​	该漏洞与nginx、php版本无关,属于用户配置不当造成的解析漏洞。由于nginx.conf的如下配置导致nginx把以’.php’结尾的文件交给fastcgi处理,对于任意文件名，在后面添加&#x2F;xxx.php（xxx）为任意字符后，即可将文件作为php解析。</p>
+<h4 id="目录遍历漏洞"><a href="#目录遍历漏洞" class="headerlink" title="目录遍历漏洞"></a><strong>目录遍历漏洞</strong></h4><p>​	Nginx的目录遍历与apache一样,属于配置方面的问题,错误的配置可导致目录遍历与源码泄露。</p>
+<h4 id="空字节任意代码执行漏洞"><a href="#空字节任意代码执行漏洞" class="headerlink" title="空字节任意代码执行漏洞"></a><strong>空字节任意代码执行漏洞</strong></h4><p>​	Ngnix在遇到%00空字节时与后端FastCGI处理不一致，导致可以在图片中嵌入PHP代码然后通过访问xxx.jpg%00.php来执行其中的代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nginx 0.5.*</span><br><span class="line">nginx 0.6.*</span><br><span class="line">nginx 0.7 &lt;= 0.7.65</span><br><span class="line">nginx 0.8 &lt;= 0.8.37</span><br></pre></td></tr></table></figure>
+
+<h4 id="CRLF注入漏洞"><a href="#CRLF注入漏洞" class="headerlink" title="CRLF注入漏洞"></a><strong>CRLF注入漏洞</strong></h4><p>​	CRLF是”回车+换行”(rn)的简称,其十六进制编码分别为0x0d和0x0a。在HTTP协议中,HTTP header与HTTP Body是用两个CRLF分隔的,浏览器就是根据这两个CRLF来取出HTTP内容并显示出来。所以,一旦我们能够控制HTTP消息头中的字符,注入一些恶意的换行,这样我们就能注入一些会话Cookie或者HTML代码。CRLF漏洞常出现在Location与Set-cookie消息头中。</p>
+<h4 id="文件名逻辑漏洞-CVE-2013-4547"><a href="#文件名逻辑漏洞-CVE-2013-4547" class="headerlink" title="文件名逻辑漏洞(CVE-2013-4547)"></a><strong>文件名逻辑漏洞(CVE-2013-4547)</strong></h4><p>当请求如下URI时：&#x2F;test[0x20]&#x2F;…&#x2F;admin&#x2F;index.php，这个URI不会匹配上location后面的&#x2F;admin&#x2F;，也就绕过了其中的IP验证；但最后请求的是&#x2F;test[0x20]&#x2F;…&#x2F;admin&#x2F;index.php文件，也就是&#x2F;admin&#x2F;index.php，成功访问到后台。（这个前提是需要有一个目录叫test：这是Linux系统的特点，如果有一个不存在的目录，则即使跳转到上一层，也会爆文件不存在的错误，Windows下没有这个限制）。</p>
+<h2 id="4、Tomcat常见漏洞"><a href="#4、Tomcat常见漏洞" class="headerlink" title="4、Tomcat常见漏洞"></a>4、Tomcat常见漏洞</h2><h4 id="CVE-2020-1938文件包含漏洞"><a href="#CVE-2020-1938文件包含漏洞" class="headerlink" title="CVE-2020-1938文件包含漏洞"></a><strong>CVE-2020-1938文件包含漏洞</strong></h4><p>​	该漏洞是由于Tomcat AJP协议存在缺陷而导致，攻击者利用该漏洞可通过构造特定参数，读取服务器webapp下的任意文件，如:webapp配置文件或源代码等。若目标服务器同时存在文件上传功能，攻击者可进一步实现远程代码执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Apache Tomcat 6 </span><br><span class="line">Apache Tomcat 7 &lt; 7.0.100 </span><br><span class="line">Apache Tomcat 8 &lt; 8.5.51 </span><br><span class="line">Apache Tomcat 9 &lt; 9.0.31</span><br></pre></td></tr></table></figure>
+
+<h4 id="tomcat后台弱口令"><a href="#tomcat后台弱口令" class="headerlink" title="tomcat后台弱口令"></a><strong>tomcat后台弱口令</strong></h4><p>​	Tomcat后台存在弱口令<code>(http://x.x.x.x:8080/manager/html)</code>，进入网站后点击登录然后使用burp进行爆破测试</p>
+<p><strong>CVE-2017-12615Tomcat远程代码执行漏洞(PUT请求)</strong></p>
+<p>​	远程代码执行漏洞（CVE-2017-12615） 影响：Apache Tomcat 7.0.0 - 7.0.79（7.0.81修复不完全）当 Tomcat 运行在 Windows 主机上，且启用了 HTTP PUT 请求方法，攻击者通过构造的攻击请求向服务器上传包含任意代码的 JSP 文件，造成任意代码执行，危害十分严重</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Apache Tomcat 7.0.0 - 7.0.81</span><br><span class="line">需Tomcat开启了HTTP PUT请求</span><br></pre></td></tr></table></figure>
+
+<h4 id="CVE-2020-13942-Apache-Unomi-远程代码执行漏洞"><a href="#CVE-2020-13942-Apache-Unomi-远程代码执行漏洞" class="headerlink" title="CVE-2020-13942 Apache Unomi 远程代码执行漏洞"></a><strong>CVE-2020-13942 Apache Unomi 远程代码执行漏洞</strong></h4><p>​	Apache Unomi 是一个基于标准的客户数据平台（CDP，Customer Data Platform），用于管理在线客户和访客等信息，以提供符合访客隐私规则的个性化体验，比如 GDPR 和“不跟踪”偏好设置。其最初于 Jahia 开发，2015 年 10 月 Unomi 成为Apache 软件基金会项目。在Apache Unomi 1.5.1版本之前，攻击者可以通过精心构造的MVEL或ONGl表达式来发送恶意请求，使得Unomi服务器执行任意代码，漏洞对应编号为CVE-2020-11975，而CVE-2020-13942漏洞是对CVE-2020-11975漏洞的补丁绕过，攻击者绕过补丁检测的黑名单，发送恶意请求，在服务器执行任意代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Apache Unomi &lt; 1.5.2</span><br><span class="line">Apache Unomid的默认端口9443和8181</span><br></pre></td></tr></table></figure>
+
+<h4 id="CVE-2019-0232-Apache-Tomcat远程代码执行漏洞"><a href="#CVE-2019-0232-Apache-Tomcat远程代码执行漏洞" class="headerlink" title="CVE-2019-0232 Apache Tomcat远程代码执行漏洞"></a><strong>CVE-2019-0232 Apache Tomcat远程代码执行漏洞</strong></h4><p>​	该漏洞只对Windows平台有效，攻击者向CGI Servlet发送请求，可在具有Apache Tomcat权限的系统上注入和执行任意操作系统命令。漏洞成因是当将参数从JRE传递到Windows环境时，由于CGI_Servlet中的输入验证错误而存在该漏洞。CGI_Servlet默认是关闭的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Apache Tomcat 9.0.0.M1 ~ 9.0.17</span><br><span class="line">Apache Tomcat 8.5.0 ~ 8.5.39</span><br><span class="line">Apache Tomcat 7.0.0 ~ 7.0.93</span><br></pre></td></tr></table></figure>
+
+<h2 id="5、Weblogic常见漏洞"><a href="#5、Weblogic常见漏洞" class="headerlink" title="5、Weblogic常见漏洞"></a>5、Weblogic常见漏洞</h2><h4 id="Weblogic弱口令漏洞"><a href="#Weblogic弱口令漏洞" class="headerlink" title="Weblogic弱口令漏洞"></a><strong>Weblogic弱口令漏洞</strong></h4><p>​		输入 <code>[http://your-ip:7001/console]</code>即可进入后台</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">常见弱口令：	</span><br><span class="line">system:password		weblogic:weblogic		admin:secruity</span><br><span class="line">joe:password		mary:password		system:sercurity</span><br><span class="line">wlcsystem: wlcsystem		weblogic:Oracle@123</span><br></pre></td></tr></table></figure>
+
+<h4 id="任意文件上传漏洞（CVE-2018-2894）"><a href="#任意文件上传漏洞（CVE-2018-2894）" class="headerlink" title="任意文件上传漏洞（CVE-2018-2894）"></a><strong>任意文件上传漏洞（CVE-2018-2894）</strong></h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">涉及版本</span><br><span class="line">10.3.6，12.1.3</span><br><span class="line">12.2.1.2，12.2.1.3</span><br></pre></td></tr></table></figure>
+
+<p>进入未经授权的上传界面：<code>http://your-ip/ws_utc/config.do</code></p>
+<p>将当前目录设置为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/u01/oracle/user_projects/domains/base_domain/servers/AdminServer/tmp/_WL_internal/com.oracle.webservices.wls.ws-testclient-app-wls/4mcj4y/war/css</span><br></pre></td></tr></table></figure>
+
+<p>上传审查元素获取时间戳，<code>http://your-ip:7001/ws_utc/css/config/keystore/</code>[时间戳id]_[文件名]  getshell</p>
+<h4 id="XML-Decoder反序列化漏洞（CVE-2017-10271）"><a href="#XML-Decoder反序列化漏洞（CVE-2017-10271）" class="headerlink" title="XML Decoder反序列化漏洞（CVE-2017-10271）"></a><strong>XML Decoder反序列化漏洞（CVE-2017-10271）</strong></h4><p>涉及版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.3.6.0，12.1.3.0.0，12.2.1.1.0</span><br></pre></td></tr></table></figure>
+
+<p>漏洞地址：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/wls-wsat/CoordinatorPortType</span><br><span class="line">/wls-wsat/RegistrationPortTypeRPC</span><br><span class="line">/wls-wsat/ParticipantPortType</span><br><span class="line">/wls-wsat/RegistrationRequesterPortType</span><br><span class="line">/wls-wsat/CoordinatorPortType11</span><br><span class="line">/wls-wsat/RegistrationPortTypeRPC11</span><br><span class="line">/wls-wsat/ParticipantPortType11</span><br><span class="line">/wls-wsat/RegistrationRequesterPortType11</span><br></pre></td></tr></table></figure>
+
+<p>漏洞利用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">工具利用 --- XML反序列化漏洞检查工具</span><br><span class="line">脚本利用 --- CVE-2017-10271-poc.py</span><br><span class="line">Burp抓包传入数据验证</span><br></pre></td></tr></table></figure>
+
+<h4 id="Weblogic-SSRF漏洞（CVE-2014-4210）"><a href="#Weblogic-SSRF漏洞（CVE-2014-4210）" class="headerlink" title="Weblogic-SSRF漏洞（CVE-2014-4210）"></a><strong>Weblogic-SSRF漏洞（CVE-2014-4210）</strong></h4><p>涉及版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.0.2,	10.3.6</span><br></pre></td></tr></table></figure>
+
+<p>漏洞地址：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://your-ip:7001/uddiexplorer/SearchPublicRegistries.jsp</span><br></pre></td></tr></table></figure>
+
+<p>漏洞利用_检测：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssrf-poc_simple.py（基于python3.x）</span><br></pre></td></tr></table></figure>
+
+<h4 id="Java反序列化漏洞（CVE-2018-2628）"><a href="#Java反序列化漏洞（CVE-2018-2628）" class="headerlink" title="Java反序列化漏洞（CVE-2018-2628）"></a><strong>Java反序列化漏洞（CVE-2018-2628）</strong></h4><p>简介：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Java序列化：即把Java对象转换为字节序列的过程</span><br><span class="line">Java反序列化：是指把字节序列恢复为Java对象的过程</span><br></pre></td></tr></table></figure>
+
+<p><strong>相关历史漏洞简介</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#CVE-2015-4852</span><br><span class="line">Weblogic 直接反序列化</span><br><span class="line">是基于Weblogic t3协议引起远程代码执行的反序列化漏洞</span><br><span class="line">#CVE-2016-0638</span><br><span class="line">Weblogic 直接反序列化</span><br><span class="line">基于Weblogic t3协议引起远程代码执行的反序列化漏洞 漏洞实为CVE-2015-4852绕过 拜Oracle一直以来的黑名单修复方式所赐</span><br><span class="line">#CVE-2016-3510</span><br><span class="line">基于Weblogic t3协议引起远程代码执行的反序列化漏洞</span><br><span class="line">#CVE-2017-3248</span><br><span class="line">基于Weblogic t3协议引起远程代码执行的反序列化漏洞 属于Weblogic JRMP反序列化</span><br><span class="line">#CVE-2018-2628</span><br><span class="line">基于Weblogic t3协议引起远程代码执行的反序列化漏洞 属于 Weblogic JRMP反序列化</span><br><span class="line">#CVE-2018-2893</span><br><span class="line">基于Weblogic t3协议引起远程代码执行的反序列化漏洞 实为CVE-2018-2628绕过 同样拜Oracle一直以来的黑名单修复方式所赐 属于Weblogic JRMP反序列化</span><br></pre></td></tr></table></figure>
+
+<p>涉及版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.3.6.0，12.1.3.0，12.2.1.2，12.2.1.3</span><br></pre></td></tr></table></figure>
+
+<h2 id="6、Jboos常见漏洞"><a href="#6、Jboos常见漏洞" class="headerlink" title="6、Jboos常见漏洞"></a>6、Jboos常见漏洞</h2><h4 id="反序列化漏洞"><a href="#反序列化漏洞" class="headerlink" title="反序列化漏洞"></a>反序列化漏洞</h4><p>​	exp：<code>https://github.com/joaomatosf/JavaDeserH2HC</code></p>
+<h4 id="JMXInvokerServlet组件（CVE-2015-7501）"><a href="#JMXInvokerServlet组件（CVE-2015-7501）" class="headerlink" title="JMXInvokerServlet组件（CVE-2015-7501）"></a>JMXInvokerServlet组件（CVE-2015-7501）</h4><p>​	JBoss中&#x2F;invoker&#x2F;JMXInvokerServlet路径对外开放，JBoss的jmx组件支持反序列化。JBoss在&#x2F;invoker&#x2F;JMXInvokerServlet请求中读取了用户传入的对象，然后我们利用Apache Commons Collections中的Gadget执行任意代码。</p>
+<p>影响版本：</p>
+<p>JBoss Enterprise Application Platform 6.4.4,5.2.0,4.3.0_CP10<br>JBoss AS (Wildly) 6 and earlier<br>JBoss A-MQ 6.2.0<br>JBoss Fuse 6.2.0<br>JBoss SOA Platform (SOA-P) 5.3.1<br>JBoss Data Grid (JDG) 6.5.0<br>JBoss BRMS (BRMS) 6.1.0<br>JBoss BPMS (BPMS) 6.1.0<br>JBoss Data Virtualization (JDV) 6.1.0<br>JBoss Fuse Service Works (FSW) 6.0.0<br>JBoss Enterprise Web Server (EWS) 2.1,3.0</p>
+<h4 id="JBossMQ（CVE-2017-7504）"><a href="#JBossMQ（CVE-2017-7504）" class="headerlink" title="JBossMQ（CVE-2017-7504）"></a><strong>JBossMQ（CVE-2017-7504）</strong></h4><p>​	这个漏洞与CVE-2015-7501一样，都是利用了Apache Commons Collections的基础库进行Java反序列化漏洞的利用。差别在于CVE-2017-7504利用路径是&#x2F;jbossmq-httpil&#x2F;HTTPServerILServlet，CVE-2015-7501的利用路径是&#x2F;invoker&#x2F;JMXInvokerServlet。</p>
+<p>影响版本：</p>
+<p>Jboss AS 4.x及之前版本</p>
+<h4 id="EJBInvokerServlet组件（CVE-2013-4810）"><a href="#EJBInvokerServlet组件（CVE-2013-4810）" class="headerlink" title="EJBInvokerServlet组件（CVE-2013-4810）"></a>EJBInvokerServlet组件（CVE-2013-4810）</h4><p>​	此漏洞和CVE-2015-7501漏洞原理相同，两者的区别就在于两个漏洞选择的进行其中JMXInvokerServlet和EJBInvokerServlet利用的是org.jboss.invocation.MarshalledValue进行的反序列化操作，而web-console&#x2F;Invoker利用的是org.jboss.console.remote.RemoteMBeanInvocation进行反序列化并上传构造的文件。</p>
+<p>影响版本：</p>
+<p>​	jboss 6.x 版本</p>
+<h4 id="War后门文件部署"><a href="#War后门文件部署" class="headerlink" title="War后门文件部署"></a>War后门文件部署</h4><p>​	admin&#x2F;admin弱口令登录后台,点击add a new resource上传war包</p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            Windows忘记密码解决方案
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p><strong>场景 忘记个人计算机密码！</strong><br><strong>1、Windwos10</strong><br>首先你需要一个带有Windows10映像的可启动USB(俗称系统盘)，进入bios调整优先启动设为为USB，windows启动详情可以查看<a target="_blank" rel="noopener" href="https://www.mallocfree.com/interview/windows-5-boot.htm">Windwos详细启动流程</a>。</p>
+<p>这里使用比较老式的方式(使用cmd替换轻松访问应用程序)，替换后可以在不登陆的情况下打开提升的命令提示符。可以根据自己的选择来确定使用哪个轻松访问应用程序。如下表：</p>
+<table>
+<thead>
+<tr>
+<th><strong>名称</strong></th>
+<th><strong>.exe文件</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>屏幕键盘</strong></td>
+<td><strong>osk.exe</strong></td>
+</tr>
+<tr>
+<td><strong>放大镜</strong></td>
+<td><strong>magnify.exe</strong></td>
+</tr>
+<tr>
+<td><strong>讲述人</strong></td>
+<td><strong>narrator.exe</strong></td>
+</tr>
+<tr>
+<td><strong>粘滞键</strong></td>
+<td><strong>sethc.exe</strong></td>
+</tr>
+</tbody></table>
+<p>首先插入U盘,进入Windows Setup 界面&#x3D;&#x3D;&gt;随后选择左下角的修复计算机&#x3D;&#x3D;&gt;选额故障排除选项&#x3D;&#x3D;&gt;查看高级选项&#x3D;&#x3D;&gt;选择命令提示符（用cmd.exe覆盖osk.exe执行操作）</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">copy</span> d:\windows\system32\<span class="built_in">cmd</span>.exe d:\windows\system32\osk.exe</span><br></pre></td></tr></table></figure>
+
+<p>输入YES确定覆盖。重启电脑。</p>
+<p>随后在登录界面单击轻松应用、然后点击<strong>屏幕键盘</strong>会出现CMD管理员命令提示符。然后键入</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">net</span> user //查看本地用户</span><br><span class="line"><span class="built_in">net</span> user [UserName] [PassWord] //修改username 的密码</span><br><span class="line"><span class="built_in">net</span> localgroup [GroupName] [UserName] /add //将指定用户添加指定组</span><br></pre></td></tr></table></figure>
+
+<p>其他替换方式基本一致。</p>
+<p><strong>2、Windows11</strong> </p>
+<p>Windows 11 和Windows10 大同小异，不过替换以后会提示0x2350 因为在环境变量中的设置路径和运行的cmd路径不符合导致的。尝试添加用户也会出错，然后搜索了很久发现另外一种方式，直接利用Netplwiz工具。(**盲猜:**不出意外直接可以利用Netplwiz直接替换即可无需cmd修改密码。)</p>
+<p><strong><del>科普</del>：</strong>Netplwiz.exe是一个Windows工具，用于在Windows10&#x2F;11上管理用户账户,也是一个Windows运行命令，可以让用户轻松地删除在Windows登陆时输入密码的需要。也可以使用此命令轻松禁用密码登录或者禁用Windows自动登录、添加用户、更改权限等操作。位于C:\Windows\System32\ 。</p>
+<p>直接在上文中替换好的cmd下输入Netplwiz即可弹出用户账户控制面板。即可进行操作(仅限于本地操作)。</p>
+<p><img src="/Windwos%E7%B3%BB%E7%BB%9F/Windows%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/index/image-20221227141511887.png" alt="image-20221227141511887"></p>
+<p><img src="/Windwos%E7%B3%BB%E7%BB%9F/Windows%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/index/image-20221227141542681.png" alt="image-20221227141542681"></p>
+<p><strong>附录：Window系统命令行调用控制面板程序(将来可能用的到)</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line">control.exe /name microsoft.folderoptions		启动资源管理器的 文件夹属性 选项卡</span><br><span class="line">control.exe /name Microsoft.AddHardware			控制面板\所有控制面板项\设备和打印机</span><br><span class="line">control.exe /name Microsoft.AdministrativeTools		控制面板\所有控制面板项\管理工具</span><br><span class="line">control.exe /name Microsoft.PeopleNearMe		网络邻居</span><br><span class="line">control.exe /name Microsoft.AudioDevicesAndSoundThemes	声音</span><br><span class="line">control.exe /name Microsoft.AutoPlay			控制面板\所有控制面板项\自动播放</span><br><span class="line">control.exe /name Microsoft.Personalization		控制面板\所有控制面板项\个性化</span><br><span class="line">control.exe /name Microsoft.BackupAndRestoreCenter	控制面板\所有控制面板项\备份和还原</span><br><span class="line">control.exe /name Microsoft.PhoneAndModemOptions	设置电话和调制调解器的连接向导：位置信息</span><br><span class="line">control.exe /name Microsoft.BitLockerDriveEncryption	控制面板\所有控制面板项\BitLocker 驱动器加密</span><br><span class="line">control.exe /name Microsoft.Printers			控制面板\所有控制面板项\设备和打印机</span><br><span class="line">control.exe /name Microsoft.ColorManagement		颜色管理</span><br><span class="line">control.exe /name Microsoft.ProgramsAndFeatures		控制面板\所有控制面板项\程序和功能：</span><br><span class="line">							添加/删除程序</span><br><span class="line">control.exe /name Microsoft.DateAndTime			日期和时间</span><br><span class="line">control.exe /name Microsoft.DefaultPrograms		控制面板\所有控制面板项\默认程序</span><br><span class="line">control.exe /name Microsoft.DeviceManager		设备管理器</span><br><span class="line">control.exe /name Microsoft.SecurityCenter		安全中心：控制面板\所有控制面板项\操作中心</span><br><span class="line">control.exe /name Microsoft.SyncCenter			控制面板\所有控制面板项\同步中心</span><br><span class="line">control.exe /name Microsoft.Fonts			控制面板\所有控制面板项\字体</span><br><span class="line">control.exe /name Microsoft.System			控制面板\所有控制面板项\系统：</span><br><span class="line">							查看Windows版本等</span><br><span class="line">control.exe /name Microsoft.GameControllers		游戏控制器</span><br><span class="line">control.exe /name Microsoft.GetPrograms			控制面板\程序\获得程序</span><br><span class="line">control.exe /name Microsoft.TaskbarAndStartMenu		任务栏和“开始”菜单属性</span><br><span class="line">control.exe /name Microsoft.UserAccounts		控制面板\所有控制面板项\用户帐户</span><br><span class="line">control.exe /name Microsoft.WelcomeCenter		控制面板\所有控制面板项\入门</span><br><span class="line">control.exe /name Microsoft.iSCSIInitiator		iSCSI 发起程序 属性</span><br><span class="line">control.exe /name Microsoft.WindowsDefender		启动Windows Defender</span><br><span class="line">control.exe /name Microsoft.Keyboard			启动 键盘 属性 对话框</span><br><span class="line">control.exe /name Microsoft.WindowsFirewall		控制面板\所有控制面板项\Windows 防火墙</span><br><span class="line">control.exe /name Microsoft.MobilityCenter		Windows 移动中心</span><br><span class="line">control.exe /name Microsoft.Mouse			鼠标 属性</span><br><span class="line">control.exe /name Microsoft.NetworkAndSharingCenter	控制面板\所有控制面板项\网络和共享中心</span><br><span class="line">control.exe /name Microsoft.WindowsUpdate		控制面板\所有控制面板项\Windows Update</span><br><span class="line">control.exe /name Microsoft.OfflineFiles		脱机文件</span><br><span class="line">control.exe /name Microsoft.ParentalControls		控制面板\所有控制面板项\家长控制</span><br><span class="line">compmgmt.msc	计算机管理</span><br><span class="line">devmgmt.msc	设备管理器</span><br><span class="line">diskmgmt.msc	磁盘管理实用程序(可以进行有损分区)</span><br><span class="line">wmimgmt.msc	打开windows管理体系结构(WMI)：Wmimgmt-[控制台根节点\WMI控件(本地)]</span><br><span class="line">certmgr.msc	证书管理实用程序</span><br><span class="line">secpol.msc	本地安全策略</span><br><span class="line">services.msc	本地服务设置</span><br><span class="line">sysdm.cpl	系统属性：类似WinXP等右击“我的电脑”后选择的“属性”</span><br><span class="line">telephon.cpl	设置电话和调制调解器的连接向导：位置信息</span><br><span class="line">wscui.cpl	安全中心：控制面板\所有控制面板项\操作中心</span><br><span class="line">timedate.cpl	时间/日期 属性</span><br><span class="line">appwiz.cpl	控制面板\所有控制面板项\程序和功能：安装、反安装程序 添加/删除程序</span><br><span class="line">inetcpl.cpl	Internet属性</span><br><span class="line">intl.cpl	区域和语言选项（输入法选项）：控制属性：</span><br><span class="line">		常规文字种类、数字、货币、时间、日期、输入法区域设置</span><br><span class="line">joy.cpl		游戏选项</span><br><span class="line">mmsys.cpl	声音和音频设备：声音/多媒体属性</span><br><span class="line">ncpa.cpl	控制面板\所有控制面板项\网络连接</span><br><span class="line">powercfg.cpl	控制面板\所有控制面板项\电源选项</span><br><span class="line">desk.cpl	控制面板\所有控制面板项\显示\屏幕分辨率</span><br><span class="line">main.cpl	鼠标选项</span><br><span class="line">firewall.cpl	WINDOWS防火墙：控制面板\所有控制面板项\Windows 防火墙</span><br><span class="line">odbccp32.cpl	ODBC数据源管理器</span><br><span class="line">winver		检查Windows版本</span><br><span class="line">wiaacmgr	扫描仪和照相机向导</span><br><span class="line">cmd		CMD命令提示符</span><br><span class="line">command		CMD命令提示符</span><br><span class="line">nslookup	IP地址侦测器</span><br><span class="line">osk		打开屏幕键盘</span><br><span class="line">calc		启动计算器</span><br><span class="line">charmap		启动字符映射表</span><br><span class="line">cliconfg	SQLSERVER客户端网络实用程序</span><br><span class="line">control		打开控制面板：控制面板\所有控制面板项</span><br><span class="line">msconfig	系统配置实用程序</span><br><span class="line">mplayer2	简易widnows media player 媒体播放机</span><br><span class="line">mspaint		画图板</span><br><span class="line">shutdown	关机命令（详细请在cmd中输入shutdown/?）</span><br><span class="line">mobsync		控制面板\所有控制面板项\同步中心</span><br><span class="line">dxdiag		检查directx信息，还可以查看系统基本配置信息</span><br><span class="line">gpedit.msc	组策略（Home Basic受限）</span><br><span class="line">lusrmgr.msc	本地用户和组(本地)</span><br><span class="line">perfmon.msc	计算机性能监测程序</span><br><span class="line">dcomcnfg	打开系统组件服务</span><br><span class="line">sysedit		系统配置编辑器</span><br><span class="line">sigverif	文件签名验证程序</span><br><span class="line">SoundRecorder	系统自带录音机</span><br><span class="line">SnippingTool	系统自带截图工具</span><br><span class="line">odbcad32	ODBC数据源管理器</span><br><span class="line">syskey		系统加密，一旦加密就不能解开，保护windows 7系统的双重密码</span><br><span class="line">sfc.exe		系统文件检查器，需要管理员权限启动cmd，并在命令行中输入命令及参数</span><br><span class="line">		扫描所有受保护的系统文件的完整性，并用正确的 Microsoft 版本替换不正确的版本。</span><br><span class="line">sfc /scannow	需要管理员权限启动cmd，在DOS窗口中进行系统扫描。windows文件保护</span><br><span class="line">cleanmgr	垃圾整理</span><br><span class="line">dvdplay		DVD播放器(Windows Media Player)</span><br><span class="line">eventvwr	一个事情查看器</span><br><span class="line">eudcedit	造字程序：专用字符编辑程序</span><br><span class="line">explorer	打开资源管理器</span><br><span class="line">fsmgmt.msc	共享文件夹管理器</span><br><span class="line">shrpubw		共享文件夹设置工具：创建共享文件向导</span><br><span class="line">mmc		打开控制台</span><br><span class="line">iexpress	系统自带安装程序制作工具</span><br><span class="line">logoff		-注销命令</span><br><span class="line">mem.exe		显示内存使用情况(先要运行cmd，进入DOS命令窗口)</span><br><span class="line">migwiz		-文件转移向导</span><br><span class="line">mstsc		--远程桌面连接</span><br><span class="line">magnify		放大镜实用程序</span><br><span class="line">notepad		打开记事本</span><br><span class="line">wordpad		写字板</span><br><span class="line">write		写字板</span><br><span class="line">wuapp		控制面板\所有控制面板项\Windows Update</span><br><span class="line">regedit		注册表编辑器</span><br><span class="line">regedt32	注册表编辑器</span><br><span class="line">narrator	屏幕“讲述人”</span><br><span class="line">rsop.msc	组策略结果集</span><br><span class="line">regsvr32/?	调用、卸载DLL文件运行（详细请在cmd中输入regsvr32/?）</span><br><span class="line">taskmgr		任务管理器</span><br><span class="line">wscript 	windows脚本宿主设置</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

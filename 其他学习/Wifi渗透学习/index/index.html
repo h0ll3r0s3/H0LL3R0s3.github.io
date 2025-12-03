@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            Wifi渗透学习
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h1 id="WIFI渗透测试"><a href="#WIFI渗透测试" class="headerlink" title="#WIFI渗透测试"></a>#WIFI渗透测试</h1><p>IEEE 802.11b标准：接入方式CSMA&#x2F;CA（Carrier Sense multiple access with collision avoidance）。它定义了支持与当前wifi的无线设备进行通信的协议。</p>
+<p><strong>802.11 Wifi数据帧</strong>：</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/Wifi%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0/index/image-20230210113440221.png" alt="image-20230210113440221"></p>
+<ul>
+<li>Frame Control：它包含有关正在使用的协议、帧类型或使用的安全类型的信息。</li>
+<li>Duration：它表示现场传输将花费多长时间，以便其他设备知道信道何时再次启用。</li>
+<li>Address1：这是源发件人的MAC地址</li>
+<li>Address2：发送器的地址-AP的MAC地址</li>
+<li>Address3：接收器的地址-AP的MAC地址</li>
+<li>Sequence Control：它指示大数据包如何分段</li>
+<li>Data：帧承载的内容</li>
+<li>Frame Check Sequence：错误检查机制，用于确保帧完整性</li>
+</ul>
+<p><strong>wifi频段</strong></p>
+<p>​	2.4GHz频段：由802.11b、802.11g和802.11n标准使用，2.4GHz频段分为14个固定频率信道。每个频率通道为20MHz宽</p>
+<p>​	5GHz频段：由802.11a、802.11n、802.11ac标准使用，频段分为UNII-1、UNII-2 Extended、UNII-3和ISM。UNII代表未经许可的国家信息基础设施。ISM代表						 工业科学和医学。</p>
+<p><strong>wifi安全协议</strong></p>
+<p>1、WEP（有线等效保密）</p>
+<p>​	它是最早用于无线网络的安全协议。1999年开发，使用40位加密密钥。发现它使用的加密是易受攻击并且不安全的。</p>
+<p>2、WPA（Wifi 保护访问）</p>
+<p>​	它的开发是为了解决WEP的问题，WPA比WEP好得多，这是因为它使用称为TKIP（临时密钥完整性协议）的更强大的加密方法，并且TKIP在使用时动态更改其密钥，这确保了数据完整性。已过时，因为TKIP有一些漏洞。</p>
+<p>3、WPA2</p>
+<p>​	比WPA更加安全，使用AES对称加密算法。</p>
+<p>4、WPA3</p>
+<p>​	它于2018年推出，将预共享密钥PSK交换替换为同步对等身份验证（SEA）交换。</p>
+<hr>
+<p><strong>设备连接WIFI的阶段过程：</strong></p>
+<p>探测阶段：</p>
+<p>​	1、探测请求(广播请求)：当开始wifi连接时，客户开始在所有频道上广播探测请求以寻找接入点。</p>
+<p>​	2、探测响应：范围内的接入点开始向客户端发送响应，这时可以看到附近的接入点列表。</p>
+<p>验证阶段：</p>
+<p>​	1、身份验证请求：从列表中选择接入点，客户端将身份认证请求数据包发送到接入点。</p>
+<pre><code> 2、身份验证响应：如何身份认证请求验证成功，则客户端将会收到来自接入点的身份验证响应。
+</code></pre>
+<p>会话建立：</p>
+<p>​	1、会话建立请求：客户端想AP设备发送建立请求。</p>
+<p>​	2、会话响应请求：AP向客户端发送最终响应数据。</p>
+<p>当完成以上阶段后，数据方可交换。</p>
+<hr>
+<p><strong>MAC(Media Access Contro)地址</strong></p>
+<p>​	MAC：媒体访问控制，作为网络中每个节点的硬件地址的唯一标识，它由设备制造商分配。MAC地址在网络中用于识别设备并在设备之间传送数据。多用于二三层设备，在网络中发送的每个数据包都包含一个源MAC和目标MAC，MAC地址是12位十六进制数（长度为48位）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*（制造商）MM-MM-MM-SS-SS-SS（序列号）*</span><br></pre></td></tr></table></figure>
+
+<p><strong>修改MAC地址</strong></p>
+<p>​	因为MAC地址是每个网络设备的唯一物理地址，用于标识设备，修改它即可在网络中匿名，可修改内存中的MAC。</p>
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/Wifi%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0/index/image-20230210140426548.png" alt="image-20230210140426548"></p>
+<p>方法1：要更改MAC地址前首先要禁用网卡。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ifconfig &lt;inerface name&gt; down //此命令将停止所有无线服务，并且在更改任何值之前必须停止网卡</span><br><span class="line">Ifconfig &lt; Interface name&gt; &lt; Option&gt; &lt; MAC address&gt;</span><br><span class="line">exmple: ifconfig wlan0 hw ether 00:11:22:33:44:55//hw 硬件 enter 以太网</span><br><span class="line">ifconfig &lt;inerface name&gt; down //启用网卡</span><br></pre></td></tr></table></figure>
+
+<p>方法2：利用macchanger程序</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ifconfig &lt;inerface name&gt; down //先关闭网卡</span><br><span class="line">macchanger –help //查看帮助手册</span><br><span class="line">macchanger --random &lt;inteface name&gt; //修改为随机的mac地址</span><br></pre></td></tr></table></figure>
+
+<p>无线网卡的默认模式是：Managed，该模式只会捕获目标MAC为该设备的MAC地址的数据包。</p>
+<p><strong>捕获数据包</strong></p>
+<p>​	首先将无线网卡设置为监听模式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ifconfig &lt;interface name&gt; down  //关闭网卡</span><br><span class="line">airmon-ng check kill	//终止任何可能干扰的进程</span><br><span class="line">iwconfig &lt;interface name&gt; mode monitor 或者使用 airmon-ng start &lt;interface name&gt; // 切换为监听模式</span><br><span class="line">ifconfig &lt; Interface name&gt; up //启动网卡，仅适用于iw 启动方式</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/Wifi%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0/index/image-20230210144049281.png" alt="image-20230210144049281"></p>
+<ul>
+<li>模式更改为监控后，接口名称可以更改为 wlan0、mon0 和 wlan0mon0。因此，选择 iwconfig 后获得的名称不是问题。</li>
+<li>并非所有适配器都支持监控模式</li>
+</ul>
+<h4 id="1、收集目标范围的所有信息"><a href="#1、收集目标范围的所有信息" class="headerlink" title="1、收集目标范围的所有信息"></a>1、收集目标范围的所有信息</h4><ul>
+<li>SSID(wifi网络名称)</li>
+<li>Wifi范围</li>
+<li>wifi网络频段</li>
+<li>数据包检查</li>
+<li>RF信号泄露</li>
+<li>wifi加密机制</li>
+</ul>
+<p>2、进攻方法</p>
+<ul>
+<li>暴力破解</li>
+<li>部署恶意AP</li>
+<li>利用AP设备的错误配置或者漏洞</li>
+</ul>
+<p><strong>airodump-ng</strong></p>
+<p>​	它是一个数据包嗅探器。这是一个旨在在您处于监视模式时捕获数据包的程序。因此，它将允许我们看到我们周围的所有无线网络，并向我们展示有关它的 MAC 地址、信道、加密、连接到该网络的客户端等的详细信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">airodump-ng &lt; Interface in Monitor mode&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/Wifi%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0/index/image-20230210145635410.png" alt="image-20230210145635410"></p>
+<ul>
+<li><strong>BSSID</strong>：目标网络的MAC地址</li>
+<li><strong>RWR</strong>：网络的信号强度，数字越大越好</li>
+<li><strong>Beacons</strong>：是网络为了广播其存在而发送的帧</li>
+<li><strong>#Data</strong>：显示数据包个数或数据帧个数</li>
+<li><strong>#&#x2F;s</strong>：显示过去10秒钟收集到的数据包数量</li>
+<li><strong>CH</strong>：显示网络工作的通道</li>
+<li><strong>MB</strong>：显示网络支持的最大速度</li>
+<li><strong>ENC</strong>：显示网络中使用的加密，WEP、OPN、WPA、WPA2</li>
+<li><strong>CIPHER</strong>：显示网络中使用的密码</li>
+<li><strong>AUTH</strong>：显示网络上使用的身份验证</li>
+<li><strong>ESSID</strong>：显示网络名称</li>
+</ul>
+<p><strong>捕获特定网段的网络</strong></p>
+<p>airodump-ng仅嗅探2.4ghz频率的wifi，使用–band a参数可以捕获到5hz的频段。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">airodump-ng --band a &lt;interface name&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>a</strong>：仅使用 5Ghz 频率</li>
+<li><strong>b,g</strong>： 都只使用 2.4Ghz 频率。</li>
+<li><strong>N</strong>：使用 5 和 2.4Ghz</li>
+<li><strong>ac</strong>：使用低于 6 GHZ 的频率</li>
+</ul>
+<p><strong>捕获特定目标</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Airodump-ng –bssid [Target Mac address] –channel[Channel used by target] [Interface Name]</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0/Wifi%E6%B8%97%E9%80%8F%E5%AD%A6%E4%B9%A0/index/image-20230210152214401.png" alt="image-20230210152214401"></p>
+<ul>
+<li><strong>BSSID</strong>：显示目标网络的MAC地址</li>
+<li><strong>Station</strong>：显示连接到该网络的设备数量</li>
+<li><strong>PWR</strong>：显示每个设备的功率强度</li>
+<li><strong>Rate</strong>：速度如何</li>
+<li><strong>Lost</strong>：显示丢失的数据量</li>
+<li><strong>Frames</strong>：显示我们捕获的帧数</li>
+</ul>
+<p><strong>取消身份认证攻击</strong></p>
+<p>​	通过这种攻击，我们可以断开任何客户端与任何网络的连接，我们不需要 Wi-Fi 密码，我们不需要连接 Wi-Fi。方法是将我们的 Mac 地址更改为该客户端的 MAC 地址，并告诉路由器我想断开连接。然后，我们将再次通过将我们的 MAC 地址更改为路由器 MAC 地址来假装成为路由器，并告诉客户端您请求断开连接。</p>
+<p>**airplay-ng **</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aireplay-ng -–deauth [#DeauthPackets] -a [NetworkMac] -c [TargetMac] [Interface] //解除身份验证</span><br><span class="line">-deauth用于告诉 airplay-ng 我们要运行取消身份验证攻击并分配 100000 这是数据包的数量，以便它不断向路由器和客户端发送取消身份验证数据包并保持客户端断开连接。</span><br><span class="line">-a是目标的 MAC（媒体访问控制）地址。</span><br><span class="line">-c是目标客户端MAC地址</span><br></pre></td></tr></table></figure>
+
+<p><strong>aircrack-ng</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aircrack-ng -a 2 -b [router bssid] -w [path to wordlist] /root/Desktop/*.cap </span><br><span class="line">-a 2 表示用WPA</span><br><span class="line">-b BSSID</span><br><span class="line">-w 字典</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
