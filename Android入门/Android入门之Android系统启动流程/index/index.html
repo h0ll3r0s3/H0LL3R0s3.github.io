@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            Android入门之Android系统启动流程
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p>1、Android启动过程</p>
+<p>固件&#x3D;&#x3D;&gt;BootROM&#x2F;SBL&#x2F;&#x3D;&#x3D;&gt;Android_BootLoader&#x3D;&#x3D;&gt;Linux_Kernel&#x3D;&#x3D;&gt;InitRamFS:&#x2F;init+rc_files&#x3D;&#x3D;&gt;Frameworks_GUI&#x2F;etc…</p>
+<p><img src="/Android%E5%85%A5%E9%97%A8/Android%E5%85%A5%E9%97%A8%E4%B9%8BAndroid%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/index/image-20221226150340453.png" alt="image-20221226150340453"></p>
+<p>Android 设备启动过程的5个阶段：</p>
+<ul>
+<li>第一阶段引导ROM和引导加载程序</li>
+<li>第二阶段内核启动</li>
+<li>第三阶段初始化</li>
+<li>第四阶段是Zygote和DVM</li>
+<li>第五阶段是系统服务器和管理器</li>
+</ul>
+<p>科普：</p>
+<p>​		ROM(ROM image - 只读内存镜像)是一种只能读出事先所存数据的固态半导体存储器。不会因为电源关闭而消失。</p>
+<p>​		引导程序或引导加载程序，在加载操作系统之前启动，它实现了一系列pruebas和健康检查。</p>
+<p>​		Zygote是Android系统创建新进程的和核心进程，负责启动Dalvik虚拟机，加载一些必要的系统资源和系统类，启动system_server进程，随后进入等待处理app应用请求。–支持Dalvik VM共享代码。</p>
+<p><strong>Boot ROM和Boot Loader</strong></p>
+<p>按下电源键时，BootROM代码会从ROM将引导加载到RAM(随机存取存储器)中。告诉设备如何启动和找查系统内核的命令。引导加载程序通常分为几个阶段。主引导加载程序和辅助引导加载程序。位置位于安卓源代码&#x2F;bootable&#x2F;bootloader&#x2F;legacy&#x2F;usbloader</p>
+<p><strong>Kernel</strong></p>
+<p>Android 内核的启动方式与 Linux 内核类似。当内核启动时，它开始设置缓存、受保护的内存、调度和加载驱动程序。当内核完成系统设置时，它会在系统文件中查找“init”。位于安卓源代码&#x2F;system&#x2F;core&#x2F;init –init.rc位于安卓源代码&#x2F;system&#x2F;core&#x2F;rootdir&#x2F;</p>
+<p><strong>init进程</strong></p>
+<p>init是第一个进程，可以认为是ROOT进程。init进程有两个作用：</p>
+<ol>
+<li>挂载&#x2F;sys、&#x2F;dev、&#x2F;proc等初始目录</li>
+<li>运行init.rc</li>
+</ol>
+<p><strong>Zygote和Dalvik</strong></p>
+<p>Android 操作系统有一个名为“Zygote”的系统。Zygote 支持跨 Dalvik VM 共享代码，从而实现更低的内存占用和最短的启动时间。zygote 是一个在系统启动时启动的虚拟机进程。Zygote 预加载和初始化核心库类。位于暗安卓源代码&#x2F;frameworks&#x2F;base&#x2F;core&#x2F;java&#x2F;com&#x2F;android&#x2F;internal&#x2F;os&#x2F;ZygoteInit.java</p>
+<p><strong>SystemServer和Managers</strong></p>
+<p>Zygote预加载所有必须的Java类和资源之后，Zygote会派生一个新进程来启动系统服务器。</p>
+<ul>
+<li><p>！系统服务器是Android系统的核心，它在Dalvik初始化运行时启动。</p>
+</li>
+<li><p>其他系统服务在系统服务器进程的上下文中运行。</p>
+</li>
+<li><p>发生的第一件事是服务器将加载一个名为 android_servers 的本机库，它提供本机功能的接口。</p>
+</li>
+<li><p>然后调用将设置本机服务的本机 init 方法。</p>
+</li>
+<li><p>设置本机服务后，它会创建服务器线程。该线程会按照必要的启动顺序启动系统中剩余的服务。</p>
+</li>
+<li><p>每个服务都在系统服务器进程中的一个单独的 Dalvik 线程中运行。</p>
+</li>
+</ul>
+<p>一旦系统服务在内存中启动并运行，Android 就完成了启动过程，此时将触发“ <strong>ACTION_BOOT_COMPLETED</strong> ”标准广播操作。</p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            安卓逆向速记手册
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h1 id="安卓逆向命令速记手册"><a href="#安卓逆向命令速记手册" class="headerlink" title="安卓逆向命令速记手册"></a>安卓逆向命令速记手册</h1><h2 id="1-基础"><a href="#1-基础" class="headerlink" title="1.基础"></a>1.基础</h2><h3 id="1-ADB命令"><a href="#1-ADB命令" class="headerlink" title="#1 ADB命令"></a><strong>#1 ADB命令</strong></h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>解析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>adb version</td>
+<td>显示adb版本</td>
+</tr>
+<tr>
+<td>adb help</td>
+<td>显示adb帮助手册</td>
+</tr>
+<tr>
+<td>adb start-server</td>
+<td>启动adb服务</td>
+</tr>
+<tr>
+<td>adb kill-server</td>
+<td>关闭adb服务</td>
+</tr>
+<tr>
+<td>adb devices</td>
+<td>显示当前已连接设备</td>
+</tr>
+<tr>
+<td>adb connect</td>
+<td>用来连接设备</td>
+</tr>
+<tr>
+<td>adb root</td>
+<td>获取Android管理员ROOT用户的权限</td>
+</tr>
+<tr>
+<td>adb shell</td>
+<td>登录设备-shell</td>
+</tr>
+<tr>
+<td>adb remount</td>
+<td>获取System分区可写权限，需要root后才能有这个权限</td>
+</tr>
+<tr>
+<td>adb shell pm list packages</td>
+<td>显示所有包名</td>
+</tr>
+<tr>
+<td>adb shell pm list packages –s</td>
+<td>显示系统应用包名</td>
+</tr>
+<tr>
+<td>adb shell pm list packages -3</td>
+<td>显示第三方应用包名</td>
+</tr>
+<tr>
+<td>adb install &lt;apk 文件路径 &gt;</td>
+<td>将本地 apk 软件安装到设备上</td>
+</tr>
+<tr>
+<td>adb uninstall &lt;apk 包名 &gt;</td>
+<td>将设备上的 apk 卸载</td>
+</tr>
+<tr>
+<td>adb jdwp</td>
+<td>显示当前设备中可以被调试的进程号信息</td>
+</tr>
+<tr>
+<td>adb push &lt; 本地路径 &gt; &lt; 手机端路径 &gt;</td>
+<td>把本地的文件或文件夹复制到设备（手机）</td>
+</tr>
+<tr>
+<td>adb pull &lt; 手机端文件 &gt; &lt; 本地路径 &gt;</td>
+<td>把设备（手机）的文件或文件夹复制到本地</td>
+</tr>
+<tr>
+<td>adb logcat -v time &gt; D:\logs\logcat.log</td>
+<td>输出实时日志并保存在本地文件，通过 Ctrl+C 来停止。<strong>抓取日志的步骤</strong>：先输入命令启动日志，然后操作 App，复现 bug，再 ctrl+c 停止日志，分析本地保存的文件</td>
+</tr>
+<tr>
+<td>adb bugreport &gt;D:\logs\ bugreport.log</td>
+<td>输入指令后开始抓取 Log，不需要按 Ctrl+C 来停止，会自动化停止 Log 打印，并将日志文件保存在本地。<strong>抓取日志的步骤</strong>：主要抓取执行命令时往前 10 分钟左右的日志信息，所以在出现 bug 后立即采用此方法才有效，问题出现时间太长不建议使用此方法</td>
+</tr>
+<tr>
+<td>adb shell getprop ro.product.model</td>
+<td>获取设备型号</td>
+</tr>
+<tr>
+<td>adb shell getprop ro.build.version.release</td>
+<td>获取设备 Android 系统版本</td>
+</tr>
+<tr>
+<td>adb get-serialno</td>
+<td>获取设备的序列号（设备号）</td>
+</tr>
+<tr>
+<td>adb shell wm size</td>
+<td>获取设备屏幕分辨率</td>
+</tr>
+<tr>
+<td>adb shell screencap -p &#x2F;sdcard&#x2F;mms.png</td>
+<td>屏幕截图</td>
+</tr>
+<tr>
+<td>adb pull &#x2F;sdcard&#x2F;mms.png D:\app</td>
+<td>将截图导出到本地</td>
+</tr>
+<tr>
+<td>adb shell dumpsys activity |  find “mFocusedActivity”</td>
+<td>查看前台应用包名,适用于 Android 7.0 以下,必须先启动 app</td>
+</tr>
+<tr>
+<td>adb shell dumpsys activity |find “mResumedActivity”</td>
+<td>查看前台应用包名，适用于 Android 8.0 以上，必须先启动 app</td>
+</tr>
+<tr>
+<td>adb shell dumpsys meminfo [pname&#x2F;pid]</td>
+<td>查看指定进程名或者进程ID的内存信息</td>
+</tr>
+<tr>
+<td>adb shell dumpsys dbinfo [packagename]</td>
+<td>查看指定包名应用的数据库存储信息（包括sql语句）</td>
+</tr>
+</tbody></table>
+<h3 id="2-apktool-Keytool"><a href="#2-apktool-Keytool" class="headerlink" title="#2 apktool  - Keytool"></a><strong>#2 apktool  - Keytool</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apktool d D:\app-debug.apk -o D:\apk_tools\b				 //将指定apk文件解压到指定路径</span><br><span class="line">apktool.bat b D:\apk_tools\b -o D:\apk_tools\nopassword.apk  //将指定文件重打包为apk</span><br><span class="line">java -jar apktool.jar b -d out -o debug.apk 		//回编译</span><br><span class="line">keytool -genkey -alias abc.keystore -keyalg RSA -validity 20000 -keystore abc.keystore //生成keystore文件</span><br><span class="line">java -jar .\sign\signapk.jar .\sign\testkey.x509.pem .\sign\testkey.pk8 debug.apk debug.sig.apk //进行签名</span><br></pre></td></tr></table></figure>
+
+<h3 id="3开启调试"><a href="#3开启调试" class="headerlink" title="#3开启调试"></a><strong>#3开启调试</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">android:debuggable=&quot;true&quot;  //修改AndroidManifest.xml开启调试模式，一般添加在Application 标签内</span><br><span class="line">invoke-static &#123;&#125;, Landroid/os/Debug;-&gt;waitForDebugger()V // 直接在onCreate方法下添加代码，等待调试</span><br><span class="line">adb shell am start -D -n com.reverse.debug/com.reverse.debug.MainActivity //以调试模式启动app</span><br><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8700 //调试器附加上，waitForDebugger返回，程序运行</span><br><span class="line">adb forward tcp:远端设备端口号(进行调试程序端) tcp:本地设备端口(被调试程序端) //idad动态调试端口转发</span><br></pre></td></tr></table></figure>
+
+<h3 id="4动态调试的两种方式"><a href="#4动态调试的两种方式" class="headerlink" title="#4动态调试的两种方式"></a><strong>#4动态调试的两种方式</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#Listner方式：是调试客户端启动就准备好一个端口，当调试服务端准备好了，就连接这个端口进行调试</span><br><span class="line">#Attach方式：是调试服务端开始就启动一个端口，等待调试端来连接这个端口</span><br></pre></td></tr></table></figure>
+
+<h3 id="5在不需要反编译的情况下开启调试属性"><a href="#5在不需要反编译的情况下开启调试属性" class="headerlink" title="#5在不需要反编译的情况下开启调试属性"></a><strong>#5在不需要反编译的情况下开启调试属性</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">第一种：修改default.prop</span><br><span class="line">    出现</span><br><span class="line">    Read-only file system</span><br><span class="line">    重新挂载</span><br><span class="line">    mount -o rw,remount /</span><br><span class="line">    直接修改default.prop 文件 ro.debuggable=0 改为1 重启设备</span><br><span class="line">    sed -i &#x27;s/ro.debuggable=0/ro.debuggable=1/g&#x27; default.prop</span><br><span class="line">第二种：改写系统文件，重新编译系统镜像文件，然后刷入到设备中</span><br><span class="line">第三种：注入init进程，修改内存中的属性值</span><br><span class="line">	利用./mprop ro.debuggable 1</span><br><span class="line">	getprop ro.debuggable查看结果</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-IDA动态调试步骤"><a href="#2-IDA动态调试步骤" class="headerlink" title="2.IDA动态调试步骤"></a>2.IDA动态调试步骤</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">./andord_server //运行android_server</span><br><span class="line">adb forward tcp:&lt;port&gt; tcp:&lt;port&gt; //将远程端口转发到本地</span><br><span class="line">adb shell am start -D -n com.CMapp/com.e4a.runtime.android.mainActivity //以调试模式启动应用</span><br><span class="line">ida附加进程</span><br><span class="line">设置debugger Option选项:</span><br><span class="line">	勾选Supend on process entry point </span><br><span class="line">	勾选Supend on thread start/exit</span><br><span class="line">    勾选Supend on library load/unload</span><br><span class="line">jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=10265 //运行jdb等待调试</span><br><span class="line">如果存在进程反调试的话修改/proc/pid/status TracerPid 改为零</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
